@@ -1,2 +1,2 @@
-# deployment
-Deployment Scripts
+# provisioning
+Provisioning Bash Scripts
