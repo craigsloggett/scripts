@@ -19,3 +19,10 @@ apt -y install qemu-system-x86 qemu-utils
 # Add the local user to the KVM group
 usermod -a -G kvm $(awk -v uid=1000 -F":" '{ if($3==uid){print $1} }' /etc/passwd)
 
+# Create the Images directory.
+mkdir -p /var/lib/qemu-kvm/images
+chown root:kvm /var/lib/qemu-kvm/
+chown root:kvm /var/lib/qemu-kvm/images/
+chmod 775 /var/lib/qemu-kvm/
+chmod 775 /var/lib/qemu-kvm/images/
+
