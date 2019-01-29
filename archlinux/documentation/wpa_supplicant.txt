@@ -1,0 +1,11 @@
+iw dev
+sudo ip link set wlp58s0 up
+iw wlp58s0 link
+sudo iw wlp58s0 scan | grep SSID
+# Switch to root.
+wpa_passphrase SSID >> /etc/wpa_supplicant/wpa_supplicant-wlp58s0.conf
+# Switch back to regular user.
+sudo wpa_supplicant -B -i wlp58s0 -c /etc/wpa_supplicant/wpa_supplicant-wlp58s0.conf
+watch ip addr
+sudo pacman -Syu
+sudo systemctl enable wpa_supplicant@wlp58s0
