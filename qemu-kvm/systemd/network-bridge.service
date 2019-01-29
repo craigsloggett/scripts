@@ -1,0 +1,8 @@
+[Unit]
+Description=Setup a Network Bridge Using iproute2
+
+[Service]
+ExecStart=/usr/local/bin/setup_br0.sh
+
+[Install]
+WantedBy=multi-user.target 
