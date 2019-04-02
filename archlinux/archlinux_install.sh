@@ -226,11 +226,11 @@ set_root_password() {
 status_update() {
     if [ "$debug" = true ]
     then { 
-        echo "\nCompleted $1 Configuration, press any key to proceed...";
+        echo "\nCompleted $1 Configuration, press any key to proceed...\n";
         read -n 1;
     }
     else
-        echo "\nCompleted $1 Configuration.";
+        echo "\nCompleted $1 Configuration.\n";
     fi
 }
 
