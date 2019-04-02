@@ -226,11 +226,11 @@ set_root_password() {
 status_update() {
     if [ "$debug" = true ]
     then { 
-        echo "\nCompleted Root Password Configuration, press any key to proceed...";
+        echo "\nCompleted $1 Configuration, press any key to proceed...";
         read -n 1;
     }
     else
-        echo "\nCompleted Root Password Configuration.";
+        echo "\nCompleted $1 Configuration.";
     fi
 }
 
@@ -242,6 +242,8 @@ status_update() {
 partition_disk     # Partition the Hard Disk
 format_disk        # Format the Hard Disk
 mount_partitions   # Mount the Partitions
+
+status_update 'Disk';
 
 # Mirror Selection
 sort_mirror_list;  # Sort the Mirror List by Location and Availability
@@ -255,6 +257,8 @@ pacstrap /mnt wget;
 pacstrap /mnt polkit;                   # Allow users to issue power-related commands
 pacstrap /mnt alsa-utils;               # Audio Management
 
+status_update 'Packages';
+
 # Configure the System
 configure_fstab         # Configure the fstab File
 configure_locale        # Configure the system locale
@@ -262,6 +266,8 @@ configure_hostname      # Configure the Hostname
 configure_network       # Configure the Network
 configure_user          # Configure the Non-root User
 configure_bootloader    # Configure the EFI Bootloader
+
+status_update 'System';
 
 # VirtualBox or Physical
 if [ "$virtualbox" = true ]
@@ -276,5 +282,7 @@ fi
 
 # Root
 set_root_password       # Set the root password
+
+status_update 'Root Password';
 
 echo 'Installation Completed. Please Restart the Machine.';
