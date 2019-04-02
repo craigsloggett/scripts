@@ -1,4 +1,5 @@
 #!/bin/zsh
+
 #########################################################
 # Arch Linux Install Script
 #
@@ -13,15 +14,15 @@
 #########################################################
 
 # Options (Comment out options to set to false)
-virtualbox=false;    # Setup the VirtualBox Guest Additions
-swap=false;          # Setup a Swap partition
-debug=false;         # Require user input to proceed
+virtualbox='false';  # Setup the VirtualBox Guest Additions
+swap='false';        # Setup a Swap partition
+debug='false';       # Require user input to proceed
 
 # Hardware
 #disk='sda';         # VirtualBox Hard Disk
-disk='nvme0n1';     # Dell XPS Hard Disk
-#partition='';       # VirtualBox partition prefix
-partition='p';      # Dell XPS partition prefix
+#partition='';       # VirtualBox Partition Prefix
+disk='nvme0n1';      # Dell XPS Hard Disk
+partition='p';       # Dell XPS Partition Prefix
 bootsize='512M';
 swapsize='4G';
 bootfs='fat';
@@ -36,227 +37,148 @@ hostname='ArchBox';
 password='testpass';
 username='nerditup';
 
+#########################################################
+# Useful Functions
+#########################################################
+
 # Partition the Hard Disk
 partition_disk() {
-
-    echo ' Partitioning '"$disk"'...'
-
-    (echo g; echo n; echo 1; echo ; echo +"$bootsize"; # Boot Partition
-     echo t; echo 1;                                   # Change the Boot Partition to EFI Type
-     echo w;) | fdisk /dev/"$disk";                    # Write the Configuration to Disk
+    (echo g; echo n; echo 1; echo ; echo +"$bootsize";  # Boot Partition
+     echo t; echo 1;                                    # Change the boot partition to type: EFI.
+     echo w;) | fdisk /dev/"$disk";                     # Write the configuration to disk.
 
     if [ "$swap" = true ]
     then { 
-        # Create partitions with Swap
-        (echo n; echo 2; echo ; echo +"$swapsize"; # Swap Partition
-         echo n; echo 3; echo ; echo ;             # Root Partition
-         echo t; echo 2; echo 19;                  # Change the Swap Partition to Linux Swap Type
-         echo w;) | fdisk /dev/"$disk";            # Write the Configuration to Disk
+        # Create the disk partitions with swap.
+        (echo n; echo 2; echo ; echo +"$swapsize";  # Swap Partition
+         echo n; echo 3; echo ; echo ;              # Root Partition
+         echo t; echo 2; echo 19;                   # Change the swap partition to type: Linux Swap.
+         echo w;) | fdisk /dev/"$disk";             # Write the configuration to disk.
     }
     else
-        # Create Partitions without Swap
-        (echo n; echo 2; echo ; echo ;  # Root Partition
-         echo w;) | fdisk /dev/"$disk"; # Write the Configuration to Disk
+        # Create the disk partitions without swap.
+        (echo n; echo 2; echo ; echo ;   # Root Partition
+         echo w;) | fdisk /dev/"$disk";  # Write the configuration to disk.
     fi
     
-    if [ "$debug" = true ]
-    then { 
-        echo p | fdisk /dev/"$disk";
-        echo "\nCompleted Disk Partition, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Disk Partition.";
-    fi
+    echo p | fdisk /dev/"$disk";
 }
 
 # Format the Hard Disk
 format_disk() {
-    echo ' Formatting '"$disk"'...'
-
-    mkfs."$bootfs" /dev/"$disk""$partition"1;  	# Format Boot Partition
+    mkfs."$bootfs" /dev/"$disk""$partition"1;  	# Format the boot partition.
 
     if [ "$swap" = true ]
     then { 
-        # Format the Partitions with Swap
-        mkswap /dev/"$disk""$partition"2           # Create the Swap Partition
-        swapon /dev/"$disk""$partition"2           # Enable the Device for Paging
-        mkfs."$rootfs" /dev/"$disk""$partition"3;  # Format Root Partition
+        # Format the disk partitions with swap.
+        mkswap /dev/"$disk""$partition"2           # Format the swap partition.
+        swapon /dev/"$disk""$partition"2           # Enable the swap partition.
+        mkfs."$rootfs" /dev/"$disk""$partition"3;  # Format the root partition.
     }
     else
-        # Format the Partitions without Swap
-        mkfs."$rootfs" /dev/"$disk""$partition"2;  # Format Root Partition
+        # Format the disk partitions without swap.
+        mkfs."$rootfs" /dev/"$disk""$partition"2;  # Format the root partition.
     fi
 
-    if [ "$debug" = true ]
-    then { 
-        df -Th;
-        echo "\nCompleted Formatting the Partitions, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Formatting the Partitions.";
-    fi
+    df -Th;
 }
 
 # Mount the Partitions
 mount_partitions() {
-    echo ' Mounting '"$disk"'...'
-    
     if [ "$swap" = true ]
     then { 
-        # Mount the Root Partition (3)
-        mount /dev/"$disk""$partition"3 /mnt;   # Mount the Root Partition
+        # Mount the root partition with swap.
+        mount /dev/"$disk""$partition"3 /mnt;   # Mount the root partition.
     }
     else
-        # Mount the Root Partition (2)
-        mount /dev/"$disk""$partition"2 /mnt;   # Mount the Root Partition
+        # Mount the root partition without swap.
+        mount /dev/"$disk""$partition"2 /mnt;   # Mount the root partition.
     fi
 
-    mkdir /mnt/boot;                            # Make  the Boot Directory
-    mount /dev/"$disk""$partition"1 /mnt/boot;  # Mount the Boot Partition
+    mkdir /mnt/boot;                            # Create a boot directory to mount to.
+    mount /dev/"$disk""$partition"1 /mnt/boot;  # Mount the boot partition.
 
-    if [ "$debug" = true ]
-    then { 
-        mount;
-        echo "\nCompleted Mounting the Partitions, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Mounting the Partitions.";
-    fi
+    mount;
 }
 
 # Sort the Mirror List by Location and Availability (Putting the Closest at the Top)
 sort_mirror_list() {
-    url="https://www.archlinux.org/mirrorlist/?country=$country&protocol=https&ip_version=4&use_mirror_status=on"
-    tmpfile=$(mktemp --suffix=-mirrorlist)
+    # Generate the mirror URL and a temp file for sorting.
+    url='https://www.archlinux.org/mirrorlist/?country='"$country"'&protocol=https&ip_version=4&use_mirror_status=on';
+    tmpfile=$(mktemp --suffix=-mirrorlist);
 
     # Get latest mirror list and save to tmpfile
-    echo " Downloading the latest mirrorlist..."
+    echo 'Downloading the latest mirrorlist...';
     wget -qO- "$url" | sed 's/^#Server/Server/g' > "$tmpfile"
 
     # Backup and replace current mirrorlist file (if new file is non-zero)
     if [ -s "$tmpfile" ]
     then { 
-        echo " Backing up the original mirrorlist..."
+        echo 'Backing up the original mirrorlist...'
         mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; 
     } && { 
-        echo " Rotating the new list into place..."
+        echo 'Rotating the new list into place...'
         mv -i "$tmpfile" /etc/pacman.d/mirrorlist; 
     }
     else
-        echo " Unable to update, could not download list."
+        echo 'Unable to update, could not download list.'
     fi
-
-    # allow global read access (required for non-root yaourt execution)
-    chmod +r /etc/pacman.d/mirrorlist
-
-    if [ "$debug" = true ]
-    then { 
-        echo "\nCompleted sorting the Mirror List. The sorted list can be found in /etc/pacman.d/mirrorlist, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted sorting the Mirror List. The sorted list can be found in /etc/pacman.d/mirrorlist";
-    fi
+    
+    head -n 5 /etc/pacman.d/mirrorlist;
 }
 
 # Configure the fstab File
 configure_fstab() {
-    echo ' Generating fstab...';
     genfstab -U -p /mnt >> /mnt/etc/fstab;
 
-    if [ "$debug" = true ]
-    then { 
-        cat /mnt/etc/fstab;
-        echo "\nfstab has been generated, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nfstab has been generated.";
-    fi
+    cat /mnt/etc/fstab;
 }
 
 # Configure the System Locale
 configure_locale() {
-    echo ' Setting up Locale...';
+    # Create the locale configuration file.
     touch locale.conf_new
     echo 'LANG='"$locale" > locale.conf_new;
     export LANG="$locale";
+
+    # Copy the locale configuration file to the new system.
     cp locale.conf_new /mnt/etc/locale.conf
     rm locale.conf_new
+
     # Create a backup of the current locale.gen file
     cp /mnt/etc/locale.gen /mnt/etc/locale.gen_bak;
+
     # Remove the leading # to uncomment the desired locale
     sed 's/#'"$locale"'/'"$locale"'/g' /mnt/etc/locale.gen_bak > /mnt/etc/locale.gen;
     rm /mnt/etc/locale.gen_bak;
-    # Generate the locale
+
+    # Generate the locale for the new system.
     arch-chroot /mnt locale-gen;
     arch-chroot /mnt locale -a;
-
-    if [ "$debug" = true ]
-    then { 
-        echo "\nCompleted Locale Configuration, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Locale Configuration.";
-    fi
 }
 
 # Configure the Hostname
 configure_hostname() {
-    echo ' Configuring the Hostname...';
     echo "$hostname" > /mnt/etc/hostname;
-
-    if [ "$debug" = true ]
-    then { 
-        echo "\nCompleted Hostname Configuration, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Hostname Configuration.";
-    fi
 }
 
 # Configure the Network
 configure_network() {
-    echo ' Configuring the Network...';
     arch-chroot /mnt systemctl enable dhcpcd.service;
-
-    if [ "$debug" = true ]
-    then { 
-        echo "\nCompleted Network Configuration, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Network Configuration.";
-    fi
 }
 
 # Configure the Non-Root User
 configure_user() {
-    echo ' Setting up non-root user: '"$username"'...';
-    arch-chroot /mnt useradd -m -g users -G wheel,video -s /bin/bash $username;
-    (echo "$password"; echo "$password";) | arch-chroot /mnt passwd $username;
+    arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $username;
 
-    if [ "$debug" = true ]
-    then { 
-        echo "\nCompleted User Configuration, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted User Configuration.";
-    fi
+    (echo "$password"; echo "$password";) | arch-chroot /mnt passwd $username;
 }
 
 # Configure the Bootloader
 configure_bootloader() {
-    echo ' Setting up Bootloader...';
-    # Using systemd and bootctl
     arch-chroot /mnt bootctl --path=/boot install;
-    # Configure bootctl                                                                                    
+
+    # Configure bootctl
     mkdir -p /mnt/boot/loader;
     mkdir -p /mnt/boot/loader/entries;
     cp -v /mnt/usr/share/systemd/bootctl/loader.conf /mnt/boot/loader/loader.conf;
@@ -264,45 +186,44 @@ configure_bootloader() {
     echo 'editor  0' >> /mnt/boot/loader/loader.conf;
     echo 'title     Arch Linux' > /mnt/boot/loader/entries/arch.conf;
     echo 'linux     /vmlinuz-linux' >> /mnt/boot/loader/entries/arch.conf;
-    # Setup intel microcode updates?
+
+    # Setup Intel microcode updates?
     if [ "$virtualbox" = true ]
     then { 
-        : # No Need to Setup Intel Microcode Updates
+        : # No need to setup Intel Microcode updates.
     }
     else
-        # Setup Intel Microcode Updates
+        # Setup Intel microcode updates.
         echo 'initrd    /intel-ucode.img' >> /mnt/boot/loader/entries/arch.conf;
     fi
+
+    # Linux initramfs must go after any microcode updates.
     echo 'initrd    /initramfs-linux.img' >> /mnt/boot/loader/entries/arch.conf;
+
     if [ "$swap" = true ]
     then { 
-        # Set the Root partition with Swap
+        # Set the root partition with swap.
         echo 'options   root=/dev/'"$disk""$partition"'3 rw' >> /mnt/boot/loader/entries/arch.conf;
     }
     else
-        # Set the Root partition without Swap
+        # Set the root partition without swap.
         echo 'options   root=/dev/'"$disk""$partition"'2 rw' >> /mnt/boot/loader/entries/arch.conf;
     fi
-    
-    if [ "$debug" = true ]
-    then { 
-        cat /mnt/boot/loader/loader.conf;
-        cat /mnt/boot/loader/entries/arch.conf;
-        echo "\nCompleted Bootloader Configuration, press any key to proceed...";
-        read -n 1;
-    }
-    else
-        echo "\nCompleted Bootloader Configuration.";
-    fi
+
     # Update the bootloader
     arch-chroot /mnt bootctl update;
+
+    cat /mnt/boot/loader/loader.conf;
+    cat /mnt/boot/loader/entries/arch.conf;
 }
 
 # Set the Root Password
 set_root_password() {
-    echo ' Setting the Root Password to Default ('"$password"')';
     (echo "$password"; echo "$password";) | arch-chroot /mnt passwd;
+}
 
+# Provide a Status Update
+status_update() {
     if [ "$debug" = true ]
     then { 
         echo "\nCompleted Root Password Configuration, press any key to proceed...";
@@ -312,6 +233,10 @@ set_root_password() {
         echo "\nCompleted Root Password Configuration.";
     fi
 }
+
+#########################################################
+# Installation Procedure
+#########################################################
 
 # Disk Setup
 partition_disk     # Partition the Hard Disk
