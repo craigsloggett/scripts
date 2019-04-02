@@ -164,7 +164,7 @@ configure_hostname() {
 
 # Configure the Network
 configure_network() {
-    arch-chroot /mnt systemctl enable dhcpcd.service;
+    arch-chroot /mnt systemctl enable systemd-networkd.service;
 }
 
 # Configure the Non-Root User
