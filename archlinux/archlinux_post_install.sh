@@ -38,7 +38,7 @@ clone_dotfiles() {
 }
 
 configure_default_shell() {
-    sudo chsh -s "$(which zsh)" "$1";
+    sudo usermod -s "$(which zsh)" "$1";
 }
 
 configure_timezone() {
