@@ -46,9 +46,9 @@ configure_timezone() {
 }
 
 configure_timesync() {
-    systemctl enable systemd-timesyncd;
-    systemctl start systemd-timesyncd;
-    timedatectl set-ntp true; 
+    systemctl enable systemd-timesyncd.service
+    systemctl start systemd-timesyncd.service
+    timedatectl set-ntp true;
 }
 
 symlink_dotfiles() {
