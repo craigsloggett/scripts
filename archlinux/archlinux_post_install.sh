@@ -116,7 +116,7 @@ then {
 }
 else
     # Install Light Backlight Manager
-    install_AUR_package light-git
+    sudo pacman -S --noconfirm light
     sudo pacman -S --noconfirm xbindkeys
 fi
 
