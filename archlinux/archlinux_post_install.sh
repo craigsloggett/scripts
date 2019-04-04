@@ -38,7 +38,7 @@ clone_dotfiles() {
 }
 
 configure_default_shell() {
-    sudo usermod -s "$(which zsh)" "$1";
+    sudo chsh -s "$(which zsh)" "$1";
 }
 
 configure_timezone() {
@@ -55,7 +55,7 @@ symlink_dotfiles() {
     cd /home/"$username"/Source/GitHub/nerditup/dotfiles;
     for d in "$(ls --ignore=README* .)";
     do
-        ( stow --verbose --target=~ $d );
+        ( stow --verbose --target=/home/"$username" $d );
     done
 }
 
