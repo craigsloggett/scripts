@@ -163,8 +163,8 @@ configure_hostname() {
 
 # Configure the Network
 configure_network() {
-    arch-chroot /mnt systemctl enable systemd-networkd;
-    arch-chroot /mnt systemctl enable systemd-resolved;
+    arch-chroot /mnt systemctl enable systemd-networkd.service;
+    arch-chroot /mnt systemctl enable systemd-resolved.service;
 }
 
 # Configure the Non-Root User

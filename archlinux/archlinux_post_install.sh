@@ -38,17 +38,17 @@ clone_dotfiles() {
 }
 
 configure_default_shell() {
-    chsh -s "$(which zsh)" "$1";
+    sudo chsh -s "$(which zsh)" "$1";
 }
 
 configure_timezone() {
-    timedatectl set-timezone "$zone/$subzone";
+    sudo timedatectl set-timezone "$zone/$subzone";
 }
 
 configure_timesync() {
-    systemctl enable systemd-timesyncd.service
-    systemctl start systemd-timesyncd.service
-    timedatectl set-ntp true;
+    sudo systemctl enable systemd-timesyncd.service
+    sudo systemctl start systemd-timesyncd.service
+    sudo timedatectl set-ntp true;
 }
 
 symlink_dotfiles() {
@@ -64,13 +64,13 @@ setup_virtualbox() {
     echo 'vboxguest' >> /tmp/virtualbox.conf_new;
     echo 'vboxsf' >> /tmp/virtualbox.conf_new;
     echo 'vboxvideo' >> /tmp/virtualbox.conf_new;
-    cp /tmp/virtualbox.conf_new /etc/modules-load.d/virtualbox.conf
+    sudo cp /tmp/virtualbox.conf_new /etc/modules-load.d/virtualbox.conf
     rm /tmp/virtualbox.conf_new
 }
 
 # Set the Local Timezone
-sudo configure_timezone
-sudo configure_timesync
+configure_timezone
+configure_timesync
 
 # Setup Home Directory
 mkdir -p /home/"$username"/Source
@@ -125,7 +125,7 @@ clone_dotfiles
 symlink_dotfiles
 
 # Configure the Default Shell for Root and Non-root User
-sudo configure_default_shell root
+configure_default_shell root
 configure_default_shell "$username"
 
 echo 'Configuration Completed.';
