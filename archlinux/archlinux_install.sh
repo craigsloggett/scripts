@@ -13,7 +13,6 @@
 # Configuration Variables
 #########################################################
 
-# Options (Comment out options to set to false)
 virtualbox='false';  # Setup the VirtualBox Guest Additions
 swap='false';        # Setup a Swap partition
 debug='false';       # Require user input to proceed
