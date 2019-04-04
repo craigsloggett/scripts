@@ -15,7 +15,7 @@
 # Configuration Variables
 #########################################################
 
-virtualbox=false;
+virtualbox='false';
 username='nerditup';
 zone='Canada';
 subzone='Eastern';
