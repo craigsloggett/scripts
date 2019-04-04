@@ -25,100 +25,99 @@ subzone='Eastern';
 #########################################################
 
 install_AUR_package() {
-    cd ~
-    cd Source/AUR
-    git clone https://aur.archlinux.org/$1.git
-    cd $1
+    cd /home/"$username"/Source/AUR
+    git clone https://aur.archlinux.org/"$1".git
+    cd "$1"
     makepkg -si --noconfirm
 }
 
 clone_dotfiles() {
-    cd ~
-    mkdir -p Source/GitHub/nerditup
-    cd Source/GitHub/nerditup
+    mkdir -p /home/"$username"/Source/GitHub/nerditup
+    cd /home/"$username"/Source/GitHub/nerditup
     git clone https://github.com/nerditup/dotfiles
 }
 
 configure_default_shell() {
-    usermod -s /bin/zsh "$username";
-    usermod -s /bin/zsh root;
+    chsh -s "$(which zsh)" "$1";
 }
 
 configure_timezone() {
     timedatectl set-timezone "$zone/$subzone";
 }
 
+configure_timesync() {
+    systemctl enable systemd-timesyncd;
+    systemctl start systemd-timesyncd;
+    timedatectl set-ntp true; 
+}
+
 symlink_dotfiles() {
-    cd ~
-    # Symlink dotfiles using Stow.
-    (echo ;) | rm .xinitrc;  # Remove conflicting file
-    cd Source/GitHub/nerditup/dotfiles;
-    for d in $(ls --ignore=README* .);
+    cd /home/"$username"/Source/GitHub/nerditup/dotfiles;
+    for d in "$(ls --ignore=README* .)";
     do
         ( stow --verbose --target=~ $d );
     done
 }
 
 setup_virtualbox() {
-    # Load the VirtualBox kernel modules at boot
-    touch virtualbox.conf_new;
-    echo 'vboxguest' >> virtualbox.conf_new;
-    echo 'vboxsf' >> virtualbox.conf_new;
-    echo 'vboxvideo' >> virtualbox.conf_new;
-    cp virtualbox.conf_new /etc/modules-load.d/virtualbox.conf
-    rm virtualbox.conf_new
+    touch /tmp/virtualbox.conf_new;
+    echo 'vboxguest' >> /tmp/virtualbox.conf_new;
+    echo 'vboxsf' >> /tmp/virtualbox.conf_new;
+    echo 'vboxvideo' >> /tmp/virtualbox.conf_new;
+    cp /tmp/virtualbox.conf_new /etc/modules-load.d/virtualbox.conf
+    rm /tmp/virtualbox.conf_new
 }
 
 # Set the Local Timezone
-configure_timezone
+sudo configure_timezone
+sudo configure_timesync
 
 # Setup Home Directory
-cd ~
-mkdir -p Source
-mkdir -p Downloads
-mkdir -p Wallpaper
-mkdir -p Source/AUR
-mkdir -p Source/GitHub
-mkdir -p .config
-mkdir -p .local
-mkdir -p .local/share
+mkdir -p /home/"$username"/Source
+mkdir -p /home/"$username"/Downloads
+mkdir -p /home/"$username"/Wallpaper
+mkdir -p /home/"$username"/Source/AUR
+mkdir -p /home/"$username"/Source/GitHub
+mkdir -p /home/"$username"/.config
+mkdir -p /home/"$username"/.local
+mkdir -p /home/"$username"/.local/share
 
 # Install Preferred Terminal Applications
-pacman -S --noconfirm zsh
-pacman -S --noconfirm git
-pacman -S --noconfirm stow  # Manage Dotfiles
+sudo pacman -S --noconfirm zsh
+sudo pacman -S --noconfirm git
+sudo pacman -S --noconfirm stow  # Manage Dotfiles
 
 # Install Xorg
-pacman -S --noconfirm xorg-server xorg-xinit xorg-xsetroot xorg-xprop
-cp -v /etc/X11/xinit/xinitrc /home/$username/.xinitrc;
+sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-xsetroot xorg-xprop
 
 # Install a Desktop Environment
-#pacman -S --noconfirm bspwm           # Window Manager
-#pacman -S --noconfirm sxhkd           # Window Manager Hot Keys
+sudo pacman -S --noconfirm i3-gaps          # Window Manager
+#sudo pacman -S --noconfirm bspwm           # Window Manager
+#sudo pacman -S --noconfirm sxhkd           # Window Manager Hot Keys
 #install_AUR_package lemonbar-xft-git  # Status Bar
-pacman -S --noconfirm rxvt-unicode     # Terminal Emulator
-pacman -S --noconfirm compton          # Xorg Compositor
-pacman -S --noconfirm rofi             # Application Launcher
-pacman -S --noconfirm dunst            # Notifications
-pacman -S --noconfirm udiskie          # Automount Removable Media
-pacman -S --noconfirm feh              # Manage Wallpapers
-pacman -S --noconfirm autocutsel       # Synchronize PRIMARY copy/paste buffer with CLIPBOARD
+sudo pacman -S --noconfirm rxvt-unicode     # Terminal Emulator
+sudo pacman -S --noconfirm compton          # Xorg Compositor
+sudo pacman -S --noconfirm rofi             # Application Launcher
+sudo pacman -S --noconfirm dunst            # Notifications
+sudo pacman -S --noconfirm udiskie          # Automount Removable Media
+sudo pacman -S --noconfirm feh              # Manage Wallpapers
+sudo pacman -S --noconfirm autocutsel       # Synchronize PRIMARY copy/paste buffer with CLIPBOARD
 
 # Fonts, etc.
-pacman -S --noconfirm ttf-dejavu
-pacman -S --noconfirm ttf-liberation
+sudo pacman -S --noconfirm ttf-dejavu
+sudo pacman -S --noconfirm ttf-liberation
 
 # VirtualBox or Physical
 if [ "$virtualbox" = true ]
 then { 
     # Install VirtualBox Guest Additions (Arch Modules)
-    (echo 2; echo Y;) | pacman -S virtualbox-guest-utils
-    setup_virtualbox
+    (echo 2; echo Y;) | sudo pacman -S virtualbox-guest-utils
+    sudo setup_virtualbox
 }
 else
     # Install Light Backlight Manager
     install_AUR_package light-git
-    pacman -S --noconfirm xbindkeys
+    sudo pacman -S --noconfirm xbindkeys
 fi
 
 # Clone Configuration Files from GitHub
@@ -126,6 +125,7 @@ clone_dotfiles
 symlink_dotfiles
 
 # Configure the Default Shell for Root and Non-root User
-configure_default_shell
+sudo configure_default_shell root
+configure_default_shell "$username"
 
 echo 'Configuration Completed.';
