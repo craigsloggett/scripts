@@ -22,6 +22,7 @@ debug='false';       # Require user input to proceed
 #partition='';       # VirtualBox Partition Prefix
 disk='nvme0n1';      # Dell XPS Hard Disk
 partition='p';       # Dell XPS Partition Prefix
+network='wlp58s0';   # Dell XPS Network Interface
 bootsize='512M';
 swapsize='4G';
 bootfs='fat';
@@ -165,6 +166,11 @@ configure_hostname() {
 configure_network() {
     arch-chroot /mnt systemctl enable systemd-networkd.service;
     arch-chroot /mnt systemctl enable systemd-resolved.service;
+    echo "[Match]" > /mnt/etc/systemd/network/25-wireless.network
+    echo "Name=$network" >> /mnt/etc/systemd/network/25-wireless.network
+    echo "" >> /mnt/etc/systemd/network/25-wireless.network
+    echo "[Network]" >> /mnt/etc/systemd/network/25-wireless.network
+    echo "DHCP=ipv4" >> /mnt/etc/systemd/network/25-wireless.network
 }
 
 # Configure the Non-Root User
