@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # QEMU name and PID
-OPTS="-name Debian Stretch 9.7.0"
+OPTS="-name Debian_Stretch_9.7.0_base"
 OPTS="$OPTS -pidfile /tmp/debian-9.7.0-amd64_base.pid"
 
 # Processor
@@ -30,10 +30,10 @@ OPTS="$OPTS -boot order=c"
 #OPTS="$OPTS -boot order=d"
 
 # System drive
-OPTS="$OPTS -drive file=/var/lib/qemu-kvm/images/debian-9.7.0-amd64-standard-25GB_base.img,format=raw,media=disk,if=virtio"
+OPTS="$OPTS -drive file=/var/lib/qemu-kvm/images/debian-9.7.0-amd64-25GB_base.img,format=raw,media=disk,if=virtio"
 
 # OS installer
-OPTS="$OPTS -drive file=/var/lib/qemu-kvm/iso/debian-9.7.0-amd64-netinst.iso,index=1,media=cdrom"
+OPTS="$OPTS -drive file=/var/lib/qemu-kvm/iso/Debian/debian-9.7.0-amd64-netinst.iso,index=1,media=cdrom"
 
 # QEMU accepts various commands and queries from the user on the monitor
 # interface. Connect the monitor with the qemu process's standard input and
