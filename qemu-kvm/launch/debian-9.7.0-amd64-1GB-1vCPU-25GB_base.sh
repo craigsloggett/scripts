@@ -41,8 +41,8 @@ OPTS="$OPTS -drive file=/var/lib/qemu-kvm/iso/Debian/debian-9.7.0-amd64-netinst.
 OPTS="$OPTS -monitor telnet:localhost:5555,server,nowait"
 
 # Network
-OPTS="$OPTS -device virtio-net,netdev=network0 -netdev user,id=network0,net=10.0.1.0/24,dhcpstart=10.0.1.10"
-OPTS="$OPTS -device virtio-net,netdev=network1 -netdev tap,id=network1,ifname=tap0,script=no,downscript=no"
+OPTS="$OPTS -netdev user,id=network0,ipv6=off -device virtio-net,netdev=network0"
+OPTS="$OPTS -netdev tap,id=network1,ipv6=off,ifname=tap0,script=no,downscript=no -device virtio-net,netdev=network1"
 
 # Disable display
 #OPTS="$OPTS -vga none"
