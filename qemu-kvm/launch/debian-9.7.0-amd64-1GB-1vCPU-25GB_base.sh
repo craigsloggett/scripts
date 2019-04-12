@@ -1,16 +1,8 @@
 #!/bin/bash
 
-# Create a TAP device for the virtual machine.
-pre_interface_list=$(ip tuntap list | cut -d ':' -f1 | sort)
-
-sudo ip tuntap add mode tap user $(whoami)
-
-post_interface_list=$(ip tuntap list | cut -d ':' -f1 | sort)
-
-IFACE=$(comm -13 <(echo "$pre_interface_list") <(echo "$post_interface_list"))
-
-sudo ip link set $IFACE master br0
-sudo ip link set dev $IFACE up
+# Generate a MAC address for the network interface based on the hostname of the machine.
+HOSTNAME='DebianBox'; 
+MAC=$(echo ${HOSTNAME} | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/');
 
 # QEMU name and PID
 OPTS="-name Debian_Stretch_9.7.0_base"
@@ -54,16 +46,10 @@ OPTS="$OPTS -monitor telnet:localhost:5555,server,nowait"
 
 # Network
 OPTS="$OPTS -netdev user,id=network0,ipv6=off -device virtio-net,netdev=network0"
-OPTS="$OPTS -netdev tap,id=network1,ifname=$IFACE,script=no,downscript=no -device virtio-net,netdev=network1"
+OPTS="$OPTS -netdev tap,id=network1,ifname=tap0,script=no,downscript=no -device virtio-net,netdev=network1,mac=${MAC}"
 
-# Disable display
-#OPTS="$OPTS -vga none"
-#OPTS="$OPTS -serial null"
-#OPTS="$OPTS -parallel null"
-#OPTS="$OPTS -monitor none"
-#OPTS="$OPTS -display none"
+# Enable VNC Display
 OPTS="$OPTS -vnc :0"
-#OPTS="$OPTS -nographic"
 
 # Daemonize
 OPTS="$OPTS -daemonize"
