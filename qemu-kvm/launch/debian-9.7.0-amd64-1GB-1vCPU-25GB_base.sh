@@ -5,8 +5,8 @@ HOSTNAME='DebianBox';
 MAC=$(echo ${HOSTNAME} | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/');
 
 # QEMU name and PID
-OPTS="-name Debian_Stretch_9.7.0_base"
-OPTS="$OPTS -pidfile /tmp/debian-9.7.0-amd64_base.pid"
+OPTS="-name debian_stretch_9.7.0_1GB-1vCPU-25GB_base"
+OPTS="$OPTS -pidfile /tmp/debian_stretch_9.7.0_1GB-1vCPU-25GB_base.pid"
 
 # Processor
 # -cpu kvm=off : This does not mean kvm virtualization is disabled, it merely hides the signature from the Guest OS
