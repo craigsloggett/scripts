@@ -5,13 +5,13 @@ HOSTNAME='Usenet';
 MAC=$(echo ${HOSTNAME} | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/');
 
 # QEMU name and PID
-OPTS="-name debian_stretch_9.7.0_2GB-2vCPU-25GB_usenet"
-OPTS="$OPTS -pidfile /tmp/debian_stretch_9.7.0_2GB-2vCPU-25GB_usenet.pid"
+OPTS="-name debian_stretch_9.7.0_4GB-4vCPU-25GB_usenet"
+OPTS="$OPTS -pidfile /tmp/debian_stretch_9.7.0_4GB-4vCPU-25GB_usenet.pid"
 
 # Processor
 # -cpu kvm=off : This does not mean kvm virtualization is disabled, it merely hides the signature from the Guest OS
 OPTS="$OPTS -cpu host,kvm=off"
-OPTS="$OPTS -smp 2"
+OPTS="$OPTS -smp 4"
 OPTS="$OPTS -enable-kvm"
 
 # Machine
@@ -19,7 +19,7 @@ OPTS="$OPTS -enable-kvm"
 OPTS="$OPTS -machine type=q35,accel=kvm"
 
 # Memory
-OPTS="$OPTS -m 2G"
+OPTS="$OPTS -m 4G"
 
 # Hardware clock
 OPTS="$OPTS -rtc clock=host,base=utc"
