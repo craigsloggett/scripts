@@ -92,9 +92,6 @@ sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-xsetroot xorg-xprop
 
 # Install a Desktop Environment
 sudo pacman -S --noconfirm i3-gaps          # Window Manager
-#sudo pacman -S --noconfirm bspwm           # Window Manager
-#sudo pacman -S --noconfirm sxhkd           # Window Manager Hot Keys
-#install_AUR_package lemonbar-xft-git  # Status Bar
 sudo pacman -S --noconfirm rxvt-unicode     # Terminal Emulator
 sudo pacman -S --noconfirm compton          # Xorg Compositor
 sudo pacman -S --noconfirm rofi             # Application Launcher
