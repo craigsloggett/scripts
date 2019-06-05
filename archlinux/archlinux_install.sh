@@ -132,11 +132,7 @@ configure_network() {
     echo "Name=$network" >> /mnt/etc/systemd/network/25-wireless.network
     echo "" >> /mnt/etc/systemd/network/25-wireless.network
     echo "[Network]" >> /mnt/etc/systemd/network/25-wireless.network
-    echo "DHCP=ipv4" >> /mnt/etc/systemd/network/25-wireless.network
-
-    # Configure resolved
-    sed 's/#DNS=/DNS=1.1.1.1/g' < /mnt/etc/systemd/resolved.conf > /mnt/etc/systemd/resolved.conf.new;
-    mv /mnt/etc/systemd/resolved.conf.new /mnt/etc/systemd/resolved.conf;
+    echo "DHCP=yes" >> /mnt/etc/systemd/network/25-wireless.network
 }
 
 # Configure the Non-Root User
