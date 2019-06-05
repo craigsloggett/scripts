@@ -20,7 +20,6 @@ debug='false';       # Require user input to proceed
 disk='nvme0n1';      # Dell XPS Hard Disk
 partition='p';       # Dell XPS Partition Prefix
 network='wlp58s0';   # Dell XPS Network Interface
-bootsize='512M';
 bootfs='vfat';
 rootfs='ext4';
 
@@ -40,13 +39,12 @@ username='nerditup';
 # Partition the Hard Disk
 partition_disk() {
     # Boot Partition
-    (echo g; echo n; echo 1; echo ; echo +"$bootsize";
-     echo t; echo 1;  # Change the boot partition to type: EFI.
-     echo w;) | fdisk /dev/"$disk";
-
+    parted -s /dev/sda mklabel gpt;
+    parted -s /dev/sda mkpart primary fat32 1MiB 513MiB;
+    parted -s /dev/sda set 1 esp on;
+    
     # Root Partition
-    (echo n; echo 2; echo ; echo ;
-     echo w;) | fdisk /dev/"$disk";
+    parted -s /dev/sda mkpart primary 513MiB 100%;
 }
 
 # Format the Hard Disk
