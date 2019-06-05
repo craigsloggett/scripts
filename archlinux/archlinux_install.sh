@@ -22,9 +22,10 @@ partition='p';
 network='wlp58s0';
 rootfs='ext4';
 
-# Region
-country='CA';
-locale='en_'"$country"'.UTF-8';
+# Locale
+region='CA';
+city='Toronto';
+locale='en_'"$region"'.UTF-8';
 
 # Personal
 hostname='ArchBox';
@@ -68,7 +69,7 @@ mount_partitions() {
 # Sort the Mirror List by Location and Availability (Putting the Closest at the Top)
 sort_mirror_list() {
     # Generate the mirror URL and a temp file for sorting.
-    url='https://www.archlinux.org/mirrorlist/?country='"$country"'&protocol=https&ip_version=4&use_mirror_status=on';
+    url='https://www.archlinux.org/mirrorlist/?country='"$region"'&protocol=https&ip_version=4&use_mirror_status=on';
     tmpfile=$(mktemp --suffix=-mirrorlist);
 
     # Get latest mirror list and save to tmpfile
@@ -94,7 +95,13 @@ configure_fstab() {
     genfstab -U -p /mnt >> /mnt/etc/fstab;
 }
 
-# Configure the System Locale
+# Configure the Timezone
+configure_timezone() {
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$region/City /etc/localtime
+    arch-chroot /mnt hwclock --systohc
+}
+
+# Configure the Locale
 configure_locale() {
     # Create the locale configuration file.
     touch locale.conf_new
@@ -209,7 +216,8 @@ status_update 'Packages';
 
 # Configure the System
 configure_fstab         # Configure the fstab File
-configure_locale        # Configure the system locale
+configure_timezone      # Configure the Timezone
+configure_locale        # Configure the Locale
 configure_hostname      # Configure the Hostname
 configure_network       # Configure the Network
 configure_user          # Configure the Non-root User
