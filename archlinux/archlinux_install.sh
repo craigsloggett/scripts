@@ -17,10 +17,9 @@ virtualbox='false';  # Setup the VirtualBox Guest Additions
 debug='false';       # Require user input to proceed
 
 # Hardware
-disk='nvme0n1';      # Dell XPS Hard Disk
-partition='p';       # Dell XPS Partition Prefix
-network='wlp58s0';   # Dell XPS Network Interface
-bootfs='vfat';
+disk='nvme0n1';
+partition='p';
+network='wlp58s0';
 rootfs='ext4';
 
 # Region
@@ -39,18 +38,18 @@ username='nerditup';
 # Partition the Hard Disk
 partition_disk() {
     # Boot Partition
-    parted -s /dev/sda mklabel gpt;
-    parted -s /dev/sda mkpart primary fat32 1MiB 513MiB;
-    parted -s /dev/sda set 1 esp on;
-    
+    parted -s /dev/"$disk" mklabel gpt;
+    parted -s /dev/"$disk" mkpart primary fat32 1MiB 513MiB;
+    parted -s /dev/"$disk" set 1 esp on;
+
     # Root Partition
-    parted -s /dev/sda mkpart primary 513MiB 100%;
+    parted -s /dev/"$disk" mkpart primary 513MiB 100%;
 }
 
 # Format the Hard Disk
 format_disk() {
     # Boot Partition
-    mkfs."$bootfs" -F 32 /dev/"$disk""$partition"1;
+    mkfs.vfat -F 32 /dev/"$disk""$partition"1;
 
     # Root Partition
     mkfs."$rootfs" /dev/"$disk""$partition"2;
@@ -78,12 +77,12 @@ sort_mirror_list() {
 
     # Backup and replace current mirrorlist file (if new file is non-zero)
     if [ -s "$tmpfile" ]
-    then { 
+    then {
         echo 'Backing up the original mirrorlist...'
-        mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; 
-    } && { 
+        mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig;
+    } && {
         echo 'Rotating the new list into place...'
-        mv -i "$tmpfile" /etc/pacman.d/mirrorlist; 
+        mv -i "$tmpfile" /etc/pacman.d/mirrorlist;
     }
     else
         echo 'Unable to update, could not download list.'
@@ -155,7 +154,7 @@ configure_bootloader() {
 
     # Setup Intel microcode updates?
     if [ "$virtualbox" = true ]
-    then { 
+    then {
         : # No need to setup Intel Microcode updates.
     }
     else
@@ -166,7 +165,7 @@ configure_bootloader() {
     # Linux initramfs must go after any microcode updates.
     echo 'initrd    /initramfs-linux.img' >> /mnt/boot/loader/entries/arch.conf;
     echo 'options   root=/dev/'"$disk""$partition"'2 rw' >> /mnt/boot/loader/entries/arch.conf;
-    
+
     # Update the bootloader
     arch-chroot /mnt bootctl update;
 }
@@ -179,7 +178,7 @@ set_root_password() {
 # Provide a Status Update
 status_update() {
     if [ "$debug" = true ]
-    then { 
+    then {
         echo "\nCompleted $1 Configuration, press any key to proceed...\n";
         read -n 1;
     }
@@ -220,13 +219,13 @@ status_update 'System';
 
 # VirtualBox or Physical
 if [ "$virtualbox" = true ]
-then { 
+then {
     :
 }
 else
     # Setup Dell XPS Related Modules
     pacstrap /mnt iw wpa_supplicant;        # WiFi connections
-    pacstrap /mnt intel-ucode;              # Intel Microcode 
+    pacstrap /mnt intel-ucode;              # Intel Microcode
 fi
 
 # Root
