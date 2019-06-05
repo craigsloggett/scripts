@@ -14,18 +14,14 @@
 #########################################################
 
 virtualbox='false';  # Setup the VirtualBox Guest Additions
-swap='false';        # Setup a Swap partition
 debug='false';       # Require user input to proceed
 
 # Hardware
-#disk='sda';         # VirtualBox Hard Disk
-#partition='';       # VirtualBox Partition Prefix
 disk='nvme0n1';      # Dell XPS Hard Disk
 partition='p';       # Dell XPS Partition Prefix
 network='wlp58s0';   # Dell XPS Network Interface
 bootsize='512M';
-swapsize='4G';
-bootfs='fat';
+bootfs='vfat';
 rootfs='ext4';
 
 # Region
@@ -43,62 +39,33 @@ username='nerditup';
 
 # Partition the Hard Disk
 partition_disk() {
-    (echo g; echo n; echo 1; echo ; echo +"$bootsize";  # Boot Partition
-     echo t; echo 1;                                    # Change the boot partition to type: EFI.
-     echo w;) | fdisk /dev/"$disk";                     # Write the configuration to disk.
+    # Boot Partition
+    (echo g; echo n; echo 1; echo ; echo +"$bootsize";
+     echo t; echo 1;  # Change the boot partition to type: EFI.
+     echo w;) | fdisk /dev/"$disk";
 
-    if [ "$swap" = true ]
-    then { 
-        # Create the disk partitions with swap.
-        (echo n; echo 2; echo ; echo +"$swapsize";  # Swap Partition
-         echo n; echo 3; echo ; echo ;              # Root Partition
-         echo t; echo 2; echo 19;                   # Change the swap partition to type: Linux Swap.
-         echo w;) | fdisk /dev/"$disk";             # Write the configuration to disk.
-    }
-    else
-        # Create the disk partitions without swap.
-        (echo n; echo 2; echo ; echo ;   # Root Partition
-         echo w;) | fdisk /dev/"$disk";  # Write the configuration to disk.
-    fi
-    
-    echo p | fdisk /dev/"$disk";
+    # Root Partition
+    (echo n; echo 2; echo ; echo ;
+     echo w;) | fdisk /dev/"$disk";
 }
 
 # Format the Hard Disk
 format_disk() {
-    mkfs."$bootfs" /dev/"$disk""$partition"1;  	# Format the boot partition.
+    # Boot Partition
+    mkfs."$bootfs" -F 32 /dev/"$disk""$partition"1;
 
-    if [ "$swap" = true ]
-    then { 
-        # Format the disk partitions with swap.
-        mkswap /dev/"$disk""$partition"2           # Format the swap partition.
-        swapon /dev/"$disk""$partition"2           # Enable the swap partition.
-        mkfs."$rootfs" /dev/"$disk""$partition"3;  # Format the root partition.
-    }
-    else
-        # Format the disk partitions without swap.
-        mkfs."$rootfs" /dev/"$disk""$partition"2;  # Format the root partition.
-    fi
-
-    df -Th;
+    # Root Partition
+    mkfs."$rootfs" /dev/"$disk""$partition"2;
 }
 
 # Mount the Partitions
 mount_partitions() {
-    if [ "$swap" = true ]
-    then { 
-        # Mount the root partition with swap.
-        mount /dev/"$disk""$partition"3 /mnt;   # Mount the root partition.
-    }
-    else
-        # Mount the root partition without swap.
-        mount /dev/"$disk""$partition"2 /mnt;   # Mount the root partition.
-    fi
+    # Root Partition
+    mount /dev/"$disk""$partition"2 /mnt;
 
-    mkdir /mnt/boot;                            # Create a boot directory to mount to.
-    mount /dev/"$disk""$partition"1 /mnt/boot;  # Mount the boot partition.
-
-    mount;
+    # Boot Partition
+    mkdir /mnt/boot;  # Create a boot directory to mount to.
+    mount /dev/"$disk""$partition"1 /mnt/boot;
 }
 
 # Sort the Mirror List by Location and Availability (Putting the Closest at the Top)
@@ -123,15 +90,11 @@ sort_mirror_list() {
     else
         echo 'Unable to update, could not download list.'
     fi
-    
-    head -n 5 /etc/pacman.d/mirrorlist;
 }
 
 # Configure the fstab File
 configure_fstab() {
     genfstab -U -p /mnt >> /mnt/etc/fstab;
-
-    cat /mnt/etc/fstab;
 }
 
 # Configure the System Locale
@@ -176,7 +139,6 @@ configure_network() {
 # Configure the Non-Root User
 configure_user() {
     arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $username;
-
     (echo "$password"; echo "$password";) | arch-chroot /mnt passwd $username;
 }
 
@@ -205,22 +167,10 @@ configure_bootloader() {
 
     # Linux initramfs must go after any microcode updates.
     echo 'initrd    /initramfs-linux.img' >> /mnt/boot/loader/entries/arch.conf;
-
-    if [ "$swap" = true ]
-    then { 
-        # Set the root partition with swap.
-        echo 'options   root=/dev/'"$disk""$partition"'3 rw' >> /mnt/boot/loader/entries/arch.conf;
-    }
-    else
-        # Set the root partition without swap.
-        echo 'options   root=/dev/'"$disk""$partition"'2 rw' >> /mnt/boot/loader/entries/arch.conf;
-    fi
-
+    echo 'options   root=/dev/'"$disk""$partition"'2 rw' >> /mnt/boot/loader/entries/arch.conf;
+    
     # Update the bootloader
     arch-chroot /mnt bootctl update;
-
-    cat /mnt/boot/loader/loader.conf;
-    cat /mnt/boot/loader/entries/arch.conf;
 }
 
 # Set the Root Password
@@ -257,11 +207,6 @@ sort_mirror_list;  # Sort the Mirror List by Location and Availability
 # Install Packages
 pacstrap /mnt base;
 pacstrap /mnt base-devel;
-pacstrap /mnt ntp;
-pacstrap /mnt vim;
-pacstrap /mnt wget;
-pacstrap /mnt polkit;                   # Allow users to issue power-related commands
-pacstrap /mnt alsa-utils;               # Audio Management
 
 status_update 'Packages';
 
