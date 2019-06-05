@@ -24,7 +24,8 @@ rootfs='ext4';
 
 # Locale
 region='CA';
-city='Toronto';
+country='Canada';
+zone='Eastern';
 locale='en_'"$region"'.UTF-8';
 
 # Personal
@@ -97,7 +98,7 @@ configure_fstab() {
 
 # Configure the Timezone
 configure_timezone() {
-    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$region/City /etc/localtime
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$country/$zone /etc/localtime
     arch-chroot /mnt hwclock --systohc
 }
 
