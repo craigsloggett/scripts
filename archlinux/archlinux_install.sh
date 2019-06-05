@@ -107,7 +107,7 @@ configure_locale() {
     export LANG="$locale";
 
     # Remove the leading # to uncomment the desired locale
-    sed 's/#'"$locale"'/'"$locale"'/g' /mnt/etc/locale.gen;
+    sed 's/#'"$locale"'/'"$locale"'/g' < /mnt/etc/locale.gen > /mnt/etc/locale.gen;
     
     # Generate the locale for the new system.
     arch-chroot /mnt locale-gen;
@@ -134,7 +134,7 @@ configure_network() {
     echo "DHCP=ipv4" >> /mnt/etc/systemd/network/25-wireless.network
 
     # Configure resolved
-    sed 's/#DNS=/DNS=1.1.1.1/g' /mnt/etc/systemd/resolved.conf;
+    sed 's/#DNS=/DNS=1.1.1.1/g' < /mnt/etc/systemd/resolved.conf > /mnt/etc/systemd/resolved.conf;
 }
 
 # Configure the Non-Root User
