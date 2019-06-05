@@ -104,25 +104,16 @@ configure_timezone() {
 
 # Configure the Locale
 configure_locale() {
-    # Create the locale configuration file.
-    touch locale.conf_new
-    echo 'LANG='"$locale" > locale.conf_new;
     export LANG="$locale";
 
-    # Copy the locale configuration file to the new system.
-    cp locale.conf_new /mnt/etc/locale.conf
-    rm locale.conf_new
-
-    # Create a backup of the current locale.gen file
-    cp /mnt/etc/locale.gen /mnt/etc/locale.gen_bak;
-
     # Remove the leading # to uncomment the desired locale
-    sed 's/#'"$locale"'/'"$locale"'/g' /mnt/etc/locale.gen_bak > /mnt/etc/locale.gen;
-    rm /mnt/etc/locale.gen_bak;
-
+    sed 's/#'"$locale"'/'"$locale"'/g' /mnt/etc/locale.gen;
+    
     # Generate the locale for the new system.
     arch-chroot /mnt locale-gen;
-    arch-chroot /mnt locale -a;
+
+    # Set the LANG variable accordingly.
+    echo 'LANG='"$locale" > /mnt/etc/locale.conf;
 }
 
 # Configure the Hostname
@@ -134,11 +125,16 @@ configure_hostname() {
 configure_network() {
     arch-chroot /mnt systemctl enable systemd-networkd.service;
     arch-chroot /mnt systemctl enable systemd-resolved.service;
+
+    # Configure networkd
     echo "[Match]" > /mnt/etc/systemd/network/25-wireless.network
     echo "Name=$network" >> /mnt/etc/systemd/network/25-wireless.network
     echo "" >> /mnt/etc/systemd/network/25-wireless.network
     echo "[Network]" >> /mnt/etc/systemd/network/25-wireless.network
     echo "DHCP=ipv4" >> /mnt/etc/systemd/network/25-wireless.network
+
+    # Configure resolved
+    sed 's/#DNS=/DNS=1.1.1.1/g' /mnt/etc/systemd/resolved.conf;
 }
 
 # Configure the Non-Root User
