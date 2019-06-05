@@ -98,8 +98,14 @@ configure_fstab() {
 
 # Configure the Timezone
 configure_timezone() {
-    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$country/$zone /etc/localtime
-    arch-chroot /mnt hwclock --systohc
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$country/$zone /etc/localtime;
+    arch-chroot /mnt hwclock --systohc;
+}
+
+# Configure the Timesync Service
+configure_timesync() {
+    arch-chroot /mnt systemctl enable systemd-timesyncd.service;
+    arch-chroot /mnt timedatectl set-ntp true;
 }
 
 # Configure the Locale
@@ -212,6 +218,7 @@ status_update 'Packages';
 # Configure the System
 configure_fstab         # Configure the fstab File
 configure_timezone      # Configure the Timezone
+configure_timesync      # Configure the Timesync Service
 configure_locale        # Configure the Locale
 configure_hostname      # Configure the Hostname
 configure_network       # Configure the Network

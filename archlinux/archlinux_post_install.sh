@@ -7,8 +7,7 @@
 # applications required for an i3 X.Org desktop 
 # environment.
 #
-# Made in 2017 by nerditup
-# Last update in October, 2018
+# Created February 9th, 2017 by nerditup
 #########################################################
 
 #########################################################
@@ -16,9 +15,9 @@
 #########################################################
 
 virtualbox='false';
+
+# Personal
 username='nerditup';
-zone='Canada';
-subzone='Eastern';
 
 #########################################################
 # Useful Functions
@@ -35,20 +34,6 @@ clone_dotfiles() {
     mkdir -p /home/"$username"/Source/GitHub/nerditup
     cd /home/"$username"/Source/GitHub/nerditup
     git clone https://github.com/nerditup/dotfiles
-}
-
-configure_default_shell() {
-    sudo chsh -s "$(which zsh)" "$1";
-}
-
-configure_timezone() {
-    sudo timedatectl set-timezone "$zone/$subzone";
-}
-
-configure_timesync() {
-    sudo systemctl enable systemd-timesyncd.service
-    sudo systemctl start systemd-timesyncd.service
-    sudo timedatectl set-ntp true;
 }
 
 symlink_dotfiles() {
@@ -68,10 +53,6 @@ setup_virtualbox() {
     rm /tmp/virtualbox.conf_new
 }
 
-# Set the Local Timezone
-configure_timezone
-configure_timesync
-
 # Setup Home Directory
 mkdir -p /home/"$username"/Source
 mkdir -p /home/"$username"/Downloads
@@ -83,7 +64,6 @@ mkdir -p /home/"$username"/.local
 mkdir -p /home/"$username"/.local/share
 
 # Install Preferred Terminal Applications
-sudo pacman -S --noconfirm zsh
 sudo pacman -S --noconfirm git
 sudo pacman -S --noconfirm stow  # Manage Dotfiles
 
@@ -120,9 +100,5 @@ fi
 # Clone Configuration Files from GitHub
 clone_dotfiles
 symlink_dotfiles
-
-# Configure the Default Shell for Root and Non-root User
-configure_default_shell root
-configure_default_shell "$username"
 
 echo 'Configuration Completed.';
