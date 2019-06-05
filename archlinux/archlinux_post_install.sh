@@ -64,6 +64,7 @@ mkdir -p /home/"$username"/.local
 mkdir -p /home/"$username"/.local/share
 
 # Install Preferred Terminal Applications
+sudo pacman -S --noconfirm vim
 sudo pacman -S --noconfirm git
 sudo pacman -S --noconfirm stow  # Manage Dotfiles
 
