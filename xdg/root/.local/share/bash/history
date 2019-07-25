@@ -1,0 +1,184 @@
+env
+zsh
+l s-la
+ls -la
+cd .gnupg/
+ls -la
+cd
+ls -la
+mkdir .local/share/
+mkdir .local
+env
+mkdir .local/share
+mkdir .local/share/less
+mkdir .local/share/gnupg
+mkdir .local/share/bash
+exirt
+exit
+ls -la
+cd .local/
+l s-la
+ls -la
+cd share/
+l s-la
+ls -la
+cd bash
+ls -la
+cd ..
+cd less/
+l s-la
+ls -al
+cd ~/.config/
+ls -la
+mv .config/* .
+cp -rv .config/* .
+l s-la
+ls -la
+rm -rf .config/
+ls -la
+exit
+ls -la
+env
+less ~/.config/vim/vimrc 
+ls -la
+cd .cache/vim/
+ls -la
+cd
+l s-la
+ls -la
+cd .local/share/
+mkdir vim
+ls -la
+cd
+cd .cache/
+ls -la
+cd vim/
+ls -la
+rm -rf *
+ls -la
+cd
+vim ~/.config/vim/vimrc 
+ls -la
+cd .local/share/
+ls -la
+cd vim/
+ls -la
+cd
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+env
+cd .local/share/
+ls -la
+cd vim/
+l s-la
+ls -la
+cd
+exit
+cd .local/share/vim/
+ls -la
+mkdir {backup,swap,undo}
+exit
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+cd .local/share/
+ls -la
+cd vim/
+l s-la
+ls -la
+ls swap/
+ls backup/
+ls undo/
+cd ..
+cd ..
+cd ..
+cd .cache/
+ls -la
+cd vim/
+ls -la
+cd ..
+rm -rf vim/
+ls -la
+ls -la
+cd vim/
+l s-la
+ls -al
+ls -la
+cd
+cd .local/share/
+ls -la
+cd vim/
+l s-la
+ls -la
+rm -rf backup/ swap/ undo/
+ls -la
+vim ~/.config/vim/vimrc 
+ls -la
+cd
+ls -la
+rm .viminfo 
+ls -la
+cd .local/share/vim/
+ls -la
+rm viminfo 
+ls
+cd
+cd -
+cd .
+cd ..
+ls -la
+rm -rf vim/
+l s-la
+ls -la
+cd
+ls -la
+ls -la
+cd .local/share/
+ls -la
+cd
+cd .config/vim/
+ls -la
+cd
+cd .cache/vim/
+ls -la
+cd backup/
+ls -la
+cd ../swap/
+ls -la
+ls -la
+cd
+ls -la
+cd .local/share/gnupg/
+ls -la
+mv ~/.gnupg/crls.d .
+ls -la
+cd crls.d/
+ls -al
+cat DIR.txt 
+env
+cd ..
+pwd
+cd
+rm -rf .gnupg/
+ls -la
+zsh
+cd .local/share/
+ls -la
+mkdir zsh
+ls -la
+cd
+ls -la
+zsh
+exit
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+ls -la
+ls
+ls -la
+vim ~/.config/vim/vimrc 
+vim ~/.config/vim/vimrc 
+which zsh
+exit
+chsh -s /usr/bin/zsh
+exit
