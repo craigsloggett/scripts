@@ -1,2 +1,1 @@
-# provisioning
-Provisioning Bash Scripts
+# XDG User Specification Scripts
