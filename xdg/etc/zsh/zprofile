@@ -1,16 +1,22 @@
-# /etc/profile
+# /etc/zsh/zprofile: system-wide .zprofile file for zsh(1).
+#
+# This file is sourced only for login shells (i.e. shells
+# invoked with "-" as the first character of argv[0], and
+# shells invoked with the -l flag.)
+#
+# Global Order: zshenv, zprofile, zshrc, zlogin
 
 # Set our umask
 umask 022
 
 # Append our default paths
 appendpath () {
-    case ":$PATH:" in
-        *:"$1":*)
-            ;;
-        *)
-            PATH="${PATH:+$PATH:}$1"
-    esac
+	case ":$PATH:" in
+		*:"$1":*)
+			;;
+		*)
+			PATH="${PATH:+$PATH:}$1"
+	esac
 }
 
 appendpath '/usr/local/sbin'
