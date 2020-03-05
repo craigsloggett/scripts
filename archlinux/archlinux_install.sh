@@ -20,7 +20,7 @@ debug='false';       # Require user input to proceed
 disk='nvme0n1';
 partition='p';
 network='wlp58s0';
-rootfs='ext4';
+rootfs='xfs';
 
 # Locale
 region='CA';
@@ -41,7 +41,7 @@ username='nerditup';
 partition_disk() {
     # Boot Partition
     parted -s /dev/"$disk" mklabel gpt;
-    parted -s /dev/"$disk" mkpart primary fat32 1MiB 513MiB;
+    parted -s /dev/"$disk" mkpart primary 1MiB 513MiB;
     parted -s /dev/"$disk" set 1 esp on;
 
     # Root Partition
@@ -51,7 +51,7 @@ partition_disk() {
 # Format the Hard Disk
 format_disk() {
     # Boot Partition
-    mkfs.vfat -F 32 /dev/"$disk""$partition"1;
+    mkfs.fat -F 32 /dev/"$disk""$partition"1;
 
     # Root Partition
     mkfs."$rootfs" /dev/"$disk""$partition"2;
@@ -93,13 +93,15 @@ sort_mirror_list() {
 
 # Configure the fstab File
 configure_fstab() {
-    genfstab -U -p /mnt >> /mnt/etc/fstab;
+    genfstab -U /mnt >> /mnt/etc/fstab;
 }
 
 # Configure the Timezone
 configure_timezone() {
-    arch-chroot /mnt ln -sf /usr/share/zoneinfo/$country/$zone /etc/localtime;
-    arch-chroot /mnt hwclock --systohc;
+    arch-chroot /mnt 
+    ln -sf /usr/share/zoneinfo/$country/$zone /etc/localtime;
+    hwclock --systohc;
+    exit  # Exit the chroot
 }
 
 # Configure the Timesync Service
@@ -152,9 +154,6 @@ configure_bootloader() {
     arch-chroot /mnt bootctl --path=/boot install;
 
     # Configure bootctl
-    mkdir -p /mnt/boot/loader;
-    mkdir -p /mnt/boot/loader/entries;
-    cp -v /mnt/usr/share/systemd/bootctl/loader.conf /mnt/boot/loader/loader.conf;
     echo 'timeout 4' >> /mnt/boot/loader/loader.conf;
     echo 'editor  0' >> /mnt/boot/loader/loader.conf;
     echo 'title     Arch Linux' > /mnt/boot/loader/entries/arch.conf;
@@ -210,8 +209,7 @@ status_update 'Disk';
 sort_mirror_list;  # Sort the Mirror List by Location and Availability
 
 # Install Packages
-pacstrap /mnt base;
-pacstrap /mnt base-devel;
+pacstrap /mnt base linux linux-firmware;
 
 status_update 'Packages';
 
