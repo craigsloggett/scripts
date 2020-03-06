@@ -49,17 +49,8 @@ mount_partitions() {
     #
     # EFI entries won't show up in the firmware if no file exists in esp/EFI/BOOT/foo.efi
     # the dell bios expects to find /EFI/boot/bootx64.efi
-}
 
-# Install the Bootloader
-install_bootloader() {
-    # Use the linux kernel directly as bootloader, EFISTUB.
-
-    # Setup the esp directory structure.
     mkdir -p /mnt/boot/EFI/boot
-
-    # TODO: Determine the initramfs image dynamically.
-    echo 'root=/dev/nvme0n1p2 rw initrd=\initramfs-5.4.24_1.img' > /mnt/boot/cmdline.txt
 }
 
 # Disk Setup
