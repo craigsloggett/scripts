@@ -10,6 +10,8 @@ for k in $BOOTDIR/vmlinuz*; do
 	INITRD="$BOOTDIR/initramfs-$NAME.img"
 	CMDLINE="$CMDLINE_DIR/cmdline.txt"
 
+    echo "root=/dev/nvme0n1p2 rw initrd=\\initramfs-$NAME.img" > "$CMDLINE"
+
 	objcopy \
 	    --add-section .osrel="$BOOTDIR/os-release" --change-section-vma .osrel=0x20000 \
 	    --add-section .cmdline="$CMDLINE" --change-section-vma .cmdline=0x30000 \
