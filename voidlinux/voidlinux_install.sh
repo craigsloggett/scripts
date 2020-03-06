@@ -48,12 +48,18 @@ mount_partitions() {
     # /boot/{vmlinuz-linux, initramfs-linux.img}
     #
     # EFI entries won't show up in the firmware if no file exists in esp/EFI/BOOT/foo.efi
+    # the dell bios expects to find /EFI/boot/bootx64.efi
 }
 
 # Install the Bootloader
 install_bootloader() {
-    chroot /mnt
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id="Linux" --boot-directory=/boot --recheck --debug
+    # Use the linux kernel directly as bootloader, EFISTUB.
+
+    # Setup the esp directory structure.
+    mkdir -p /mnt/boot/EFI/boot
+
+    # TODO: Determine the initramfs image dynamically.
+    echo 'root=/dev/nvme0n1p2 rw initrd=\initramfs-5.4.24_1.img' > /mnt/boot/cmdline.txt
 }
 
 # Disk Setup
@@ -62,4 +68,4 @@ mount_partitions   # Mount the Partitions
 
 # Install Packages
 export XBPS_ARCH=x86_64-musl
-xbps-install -S -R "${repo_url}" -r /mnt base-system grub-x86_64-efi
+xbps-install -S -R "${repo_url}" -r /mnt base-system
