@@ -53,6 +53,26 @@ setup_virtualbox() {
     rm /tmp/virtualbox.conf_new
 }
 
+# Export XDG Base User Directory Environment Variables
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+
+# Setup XDG Base User Directory Structure
+mkdir -p "${XDG_CONFIG_HOME}"
+mkdir -p "${XDG_CACHE_HOME}"
+mkdir -p "${XDG_DATA_HOME}"
+
+# TODO: Iterate over a list of files and ensure they exist before attempting to move them.
+# BASH XDG Specification
+mkdir -p "${XDG_CONFIG_HOME}"/bash
+mkdir -p "${XDG_DATA_HOME}"/bash
+mv /home/"$username"/.bashrc "${XDG_CONFIG_HOME}"/bash/bashrc
+mv /home/"$username"/.bash_profile "${XDG_CONFIG_HOME}"/bash/profile
+mv /home/"$username"/.bash_logout "${XDG_CONFIG_HOME}"/bash/logout
+mv /home/"$username"/.bash_history "${XDG_DATA_HOME}"/bash/history
+export HISTFILE="${XDG_DATA_HOME}"/bash/history
+
 # Setup Home Directory
 mkdir -p /home/"$username"/Source
 mkdir -p /home/"$username"/Downloads
@@ -69,7 +89,7 @@ sudo pacman -S --noconfirm git
 sudo pacman -S --noconfirm stow  # Manage Dotfiles
 
 # Install Xorg
-sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-xsetroot xorg-xprop
+sudo pacman -S --noconfirm xorg-server
 
 # Install a Desktop Environment
 sudo pacman -S --noconfirm i3-gaps          # Window Manager
