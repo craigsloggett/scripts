@@ -50,6 +50,12 @@ mount_partitions() {
     # EFI entries won't show up in the firmware if no file exists in esp/EFI/BOOT/foo.efi
 }
 
+# Install the Bootloader
+install_bootloader() {
+    chroot /mnt
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id="Linux" --boot-directory=/boot --recheck --debug
+}
+
 # Disk Setup
 format_disk        # Format the Hard Disk
 mount_partitions   # Mount the Partitions
