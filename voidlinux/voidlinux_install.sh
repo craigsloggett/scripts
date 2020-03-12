@@ -15,7 +15,7 @@ partition='p';
 rootfs='xfs';
 
 # Personal
-hostname='VoidBox';
+hostname='io';
 
 # Repository URL
 repo_url='https://mirror.clarkson.edu/voidlinux/current/musl'
@@ -51,11 +51,15 @@ mount_partitions() {
     # the dell bios expects to find /EFI/boot/bootx64.efi
 
     mkdir -p /mnt/boot/EFI/boot
+    mkdir -p /mnt/boot/EFI/Linux
 }
 
 # Disk Setup
 format_disk        # Format the Hard Disk
 mount_partitions   # Mount the Partitions
+
+# Copy the EFI STUB image to the boot directory.
+scp nerditup@jupiter.nerditup.ca:/home/nerditup/linuxx64.efi.stub /mnt/boot/EFI/Linux/
 
 # Install Packages
 export XBPS_ARCH=x86_64-musl
