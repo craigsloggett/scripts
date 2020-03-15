@@ -64,3 +64,49 @@ scp nerditup@jupiter.nerditup.ca:/home/nerditup/linuxx64.efi.stub /mnt/boot/EFI/
 # Install Packages
 export XBPS_ARCH=x86_64-musl
 xbps-install -S -R "${repo_url}" -r /mnt base-system
+
+# Install intel-ucode
+# `xbps-install -S void-repo-nonfree`
+# `xbps-install -S intel-ucode`
+# ... the linux image is built with the microcode in it, no more work necessary.
+# Generate fstab
+# Change root password
+# Copy EFI STUB image
+# Generate EFI kernel
+# Change shell for root
+# Set the local timezone `ln -sf /usr/share/zoneinfo/Canada/Eastern /etc/localtime`
+# Setup NTP
+# Set XDG base system profile variables
+# Create XDG folders in /root
+# Copy XDG bash profile variables
+# Setup bash XDG directories in home
+# Copy XDG less to profile
+# Setup less XDG directories in home
+# Copy XDG zsh to profile
+# Install zsh
+# Copy XDG zprofile zshenv
+# Setup zsh XDG directories in home
+# Copy zsh dotfiles to home
+# Change root shell to zsh
+# Install vim
+# Copy XDG vim profile
+# Setup vim XDG directories in home
+# Copy vim dotfiles to home
+# Setup wireless
+# `wpa_passphrase "SSID" >> /etc/wpa_supplicant/wpa_supplicant-wlp58s0.conf`
+# `ln -s /etc/sv/`
+# Create new user
+# Create XDG folders in /home for user
+# Configure FQDN
+# Configure ssh key
+# Install gpg
+# Copy gpg configuration to ~/.local/share/gnupg (has to be next to data)
+# Import master gpg key
+# Configure pass
+# Clone pass store to ~/.local/share/pass
+# Configure git (username, email)
+
+# Configure X11
+
+
+# ... automate building the kernel when updating
