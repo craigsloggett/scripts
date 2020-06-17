@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # macsh - macOS installation shell script.
 
@@ -22,25 +22,32 @@ main() {
     # Install Xcode Command Line Tools
     xcode-select --install
 
-    # Clone the scripts repository.
+    # system configuration
     mkdir -p "${SOURCE_DIR}"/GitHub/craigsloggett
     cd "${SOURCE_DIR}"/GitHub/craigsloggett
     
     git clone https://github.com/craigsloggett/scripts.git
 
-    echo "Executing install script."
+    cd "${SOURCE_DIR}"/GitHub/craigsloggett/scripts/macOS
+
+    find etc -type d | while read -r dir; do
+        sudo mkdir -p "${dir}"
+    done
+
+    find etc ! -type d | while read -r file; do
+        sudo cp "$file" "/${file}"
+    done
+
+    # dotfiles
+    cd "${SOURCE_DIR}"/GitHub/craigsloggett
+    git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+
+    # homebrew
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 }
 
 main "$@"
 
-#    find etc -type d | while read -r dir; do
-#        sudo mkdir -p "${dir}"
-#    done
-#
-#    # Copy the configuration files.
-#    find etc ! -type d | while read -r file; do
-#        sudo cp "$file" "/${file}"
-#    done
 #
 #    # Clone dotfiles.
 #    mkdir -p "${SOURCE_DIR}"/GitHub/craigsloggett
