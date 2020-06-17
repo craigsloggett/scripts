@@ -13,4 +13,4 @@
 # Global Order: zshenv, zprofile, zshrc, zlogin
 
 # ZSH Dot Directory
-export ZDOTDIR="${HOME}"/.config/zsh
+export ZDOTDIR="${HOME}/.config/zsh"
