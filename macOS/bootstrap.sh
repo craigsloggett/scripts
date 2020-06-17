@@ -19,8 +19,8 @@ main() {
     mkdir -p "${XDG_BIN_HOME}"
     mkdir -p "${XDG_LIB_HOME}"
 
-    # Install Xcode Command Line Tools
-    xcode-select --install
+    # homebrew
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
     # system configuration
     mkdir -p "${SOURCE_DIR}"/GitHub/craigsloggett
@@ -42,8 +42,6 @@ main() {
     cd "${SOURCE_DIR}"/GitHub/craigsloggett
     git clone -b macOS https://github.com/craigsloggett/dotfiles.git
 
-    # homebrew
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 }
 
 main "$@"
