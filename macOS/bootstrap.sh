@@ -42,6 +42,14 @@ main() {
     cd "${SOURCE_DIR}"/GitHub/craigsloggett
     git clone -b macOS https://github.com/craigsloggett/dotfiles.git
 
+    # stow
+    brew install stow
+
+    cd "${SOURCE_DIR}"/GitHub/craigsloggett/dotfiles;
+    for d in "$(ls --ignore=README* .)";
+    do
+        ( stow --verbose --target="${HOME}" $d );
+    done
 }
 
 main "$@"
