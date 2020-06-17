@@ -19,31 +19,37 @@ main() {
     mkdir -p "${XDG_BIN_HOME}"
     mkdir -p "${XDG_LIB_HOME}"
 
-    find etc -type d | while read -r dir; do
-        sudo mkdir -p "${dir}"
-    done
+    # Install Xcode Command Line Tools
+    xcode-select --install
 
-    # Copy the configuration files.
-    find etc ! -type d | while read -r file; do
-        sudo cp "$file" "/${file}"
-    done
-
-    # Install brew
-    /bin/bash -c `curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh`
-
-    # Clone dotfiles.
+    # Clone the scripts repository.
     mkdir -p "${SOURCE_DIR}"/GitHub/craigsloggett
     cd "${SOURCE_DIR}"/GitHub/craigsloggett
     
-    git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+    git clone https://github.com/craigsloggett/scripts.git
 
-    # Configure zsh
-    cd dotfiles/zsh
+    echo "Executing install script."
 }
-
 
 main "$@"
 
+#    find etc -type d | while read -r dir; do
+#        sudo mkdir -p "${dir}"
+#    done
+#
+#    # Copy the configuration files.
+#    find etc ! -type d | while read -r file; do
+#        sudo cp "$file" "/${file}"
+#    done
+#
+#    # Clone dotfiles.
+#    mkdir -p "${SOURCE_DIR}"/GitHub/craigsloggett
+#    cd "${SOURCE_DIR}"/GitHub/craigsloggett
+#    
+#    git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+#
+#    # Configure zsh
+#    cd dotfiles/zsh
 # Setup ZSH
 #sudo install -C -m 644 etc/zshenv /etc/zshenv
 
