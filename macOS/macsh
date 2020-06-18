@@ -29,6 +29,8 @@ main() {
     chmod 755 /usr/local/share/zsh
     chmod 755 /usr/local/share/zsh/site-functions
 
+    mkdir -p "${XDG_DATA_HOME}"/zsh
+
     # vim
     mkdir -p "${XDG_CACHE_HOME}"/vim
 
