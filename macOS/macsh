@@ -62,6 +62,17 @@ main() {
     if [[ ! -f /usr/local/bin/gpg1 ]]; then
         brew install gpg1
     fi
+
+    scp nerditup@jupiter.nerditup.ca:/srv/storage/.security/gnupg/personal/craig_sloggett_private_encrypt.asc .
+
+    gpg1 --import craig_sloggett_private_encrypt.asc
+
+    rm craig_sloggett_private_encrypt.asc
+
+    # pass
+
+    git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
+    brew install pass
 }
 
 main "$@"
