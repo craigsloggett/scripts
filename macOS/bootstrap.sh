@@ -6,15 +6,15 @@ main() {
     # homebrew
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-    # system configuration
-    mkdir -p "${HOME}"/Source/GitHub/craigsloggett
-    cd "${HOME}"/Source/GitHub/craigsloggett
-    
-    git clone https://github.com/craigsloggett/scripts.git
+    ## system configuration
+    #mkdir -p "${HOME}"/Source/GitHub/craigsloggett
+    #cd "${HOME}"/Source/GitHub/craigsloggett
+    #
+    #git clone https://github.com/craigsloggett/scripts.git
 
-    cd "${SOURCE_DIR}"/GitHub/craigsloggett/scripts/macOS
+    #cd "${HOME}"/Source/GitHub/craigsloggett/scripts/macOS
 
-    "$(./macsh)"
+    #"$(./macsh)"
 }
 
 main "$@"
