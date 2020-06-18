@@ -1,20 +1,48 @@
 #!/bin/bash
 #
-# bootstrap.sh - macOS installation shell script.
+# macsh - macOS installation shell script.
 
 main() {
-    # homebrew
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-
-    # system configuration
-    mkdir -p "${HOME}"/Source/GitHub/craigsloggett
-    cd "${HOME}"/Source/GitHub/craigsloggett
+    echo $PWD
     
-    git clone https://github.com/craigsloggett/scripts.git
+    find etc ! -type d | while read -r file; do
+        echo "$file"
+    done
 
-    cd "${SOURCE_DIR}"/GitHub/craigsloggett/scripts/macOS
+    ## Export the XDG environment variables if they aren't already.
+    #export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+    #export XDG_CACHE_HOME="${XDG_CACHE_HOME:-"${HOME}/.cache"}"
+    #export XDG_DATA_HOME="${XDG_DATA_HOME:-"${HOME}/.local/share"}"
+    #export XDG_BIN_HOME="${XDG_BIN_HOME:-"${HOME}/.local/bin"}"
+    #export XDG_LIB_HOME="${XDG_LIB_HOME:-"${HOME}/.local/lib"}"
 
-    "$(./macsh)"
+    ## Create all directories beforehand.
+    #mkdir -p "${XDG_CONFIG_HOME}"
+    #mkdir -p "${XDG_CACHE_HOME}"
+    #mkdir -p "${XDG_DATA_HOME}"
+    #mkdir -p "${XDG_BIN_HOME}"
+    #mkdir -p "${XDG_LIB_HOME}"
+
+    #find etc -type d | while read -r dir; do
+    #    sudo mkdir -p "${dir}"
+    #done
+
+    #find etc ! -type d | while read -r file; do
+    #    sudo cp "$file" "/${file}"
+    #done
+
+    ## dotfiles
+    #cd "${SOURCE_DIR}"/GitHub/craigsloggett
+    #git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+
+    ## stow
+    #brew install stow
+
+    #cd "${SOURCE_DIR}"/GitHub/craigsloggett/dotfiles;
+    #for d in "$(ls --ignore=README* .)";
+    #do
+    #    ( stow --verbose --target="${HOME}" $d );
+    #done
 }
 
 main "$@"
