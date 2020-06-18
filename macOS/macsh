@@ -29,13 +29,15 @@ main() {
     chmod 755 /usr/local/share/zsh
     chmod 755 /usr/local/share/zsh/site-functions
 
+    # vim
+    mkdir -p "${XDG_CACHE_HOME}"/vim
+
     # dotfiles
     if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
         cd "${HOME}"/Source/GitHub/craigsloggett
         git clone -b macOS https://github.com/craigsloggett/dotfiles.git
     fi
 
-    # stow
     if [[ ! -f /usr/local/bin/stow ]]; then
         brew install stow
     fi
