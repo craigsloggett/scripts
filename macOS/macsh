@@ -46,7 +46,7 @@ main() {
 
     cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
 
-    for d in "$(ls | grep -v 'firefox' -v 'gnupg' -v 'README.*')";
+    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
     do
         ( stow --verbose --target="${HOME}" $d );
     done
