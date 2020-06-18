@@ -52,12 +52,13 @@ main() {
     done
 
     # gpg
+    export GNUPGHOME="${XDG_DATA_HOME:="${HOME}/.local/share"}/gnupg"
 
-    mkdir -p  "${XDG_DATA_HOME}/gnupg"
-    cp "${HOME}/Source/GitHub/craigsloggett/dotfiles/gnupg/.local/share/gnupg/gpg.conf" "${XDG_DATA_HOME}/gnupg"
+    mkdir -p  "${GNUPGHOME}"
+    cp "${HOME}/Source/GitHub/craigsloggett/dotfiles/gnupg/.local/share/gnupg/gpg.conf" "${GNUPGHOME}"
 
-    chmod 700 "${XDG_DATA_HOME}/gnupg"
-    chmod 600 "${XDG_DATA_HOME}/gnupg/gpg.conf"
+    chmod 700 "${GNUPGHOME}"
+    chmod 600 "${GNUPGHOME}/gpg.conf"
 
     if [[ ! -f /usr/local/bin/gpg1 ]]; then
         brew install gpg1
