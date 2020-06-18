@@ -46,10 +46,22 @@ main() {
 
     cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
 
-    for d in "$(ls | grep -v 'README.*')";
+    for d in "$(ls | grep -v 'gnupg' | grep -v 'README.*')";
     do
         ( stow --verbose --target="${HOME}" $d );
     done
+
+    # gpg
+
+    mkdir -p  "${XDG_DATA_HOME}/gnupg"
+    cp "${HOME}/Source/GitHub/craigsloggett/dotfiles/gnupg/.local/share/gnupg/gpg.conf" "${XDG_DATA_HOME}/gnupg"
+
+    chmod 700 "${XDG_DATA_HOME}/gnupg"
+    chmod 600 "${XDG_DATA_HOME}/gnupg/gpg.conf"
+
+    if [[ ! -f /usr/local/bin/gpg1 ]]; then
+        brew install gpg1
+    fi
 }
 
 main "$@"
