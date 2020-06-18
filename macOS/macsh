@@ -17,6 +17,7 @@ main() {
     mkdir -p "${XDG_BIN_HOME}"
     mkdir -p "${XDG_LIB_HOME}"
 
+    # zsh
     find etc -type d | while read -r dir; do
         sudo mkdir -p "${dir}"
     done
@@ -24,6 +25,9 @@ main() {
     find etc ! -type d | while read -r file; do
         sudo cp "$file" "/${file}"
     done
+
+    chmod 755 /usr/local/share/zsh
+    chmod 755 /usr/local/share/zsh/site-functions
 
     # dotfiles
     if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
