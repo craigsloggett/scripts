@@ -32,15 +32,16 @@ main() {
     fi
 
     # stow
-    if [[ -f /usr/local/bin/stow ]]; then
+    if [[ ! -f /usr/local/bin/stow ]]; then
         brew install stow
     fi
 
-    #cd "${SOURCE_DIR}"/GitHub/craigsloggett/dotfiles;
+    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
     #for d in "$(ls --ignore=README* .)";
-    #do
-    #    ( stow --verbose --target="${HOME}" $d );
-    #done
+    for d in "$(ls | grep -v 'README.*')";
+    do
+        ( stow --verbose --target="${HOME}" $d );
+    done
 }
 
 main "$@"
