@@ -18,8 +18,10 @@ main() {
     mkdir -p "${XDG_LIB_HOME}"
 
     # ssh
-    ssh-keygen -t ed25519
-    ssh-copy-id nerditup@jupiter.nerditup.ca
+    if [[ ! -f "${HOME}"/.ssh/id_ed25519 ]]; then
+        ssh-keygen -t ed25519
+        ssh-copy-id nerditup@jupiter.nerditup.ca
+    fi
 
     # zsh
     find etc -type d | while read -r dir; do
