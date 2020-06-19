@@ -99,9 +99,10 @@ main() {
     mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
     cd "${HOME}"/Source/GitHub/ghacksuserjs
 
-    if [[ -d "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]
+    if [[ -d "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
         rm -rf "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
     fi
+
     git clone https://github.com/ghacksuserjs/ghacks-user.js.git
     cd "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
 
