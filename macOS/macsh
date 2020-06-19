@@ -99,6 +99,7 @@ main() {
     /Applications/Firefox.app/Contents/MacOS/./firefox &
     sleep 10
     kill -9 "$(pgrep firefox)"
+    sleep 5
 
     mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
     cd "${HOME}"/Source/GitHub/ghacksuserjs
