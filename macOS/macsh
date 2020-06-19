@@ -54,6 +54,8 @@ main() {
         do
             ( stow --verbose --target="${HOME}" $d );
         done
+
+        cd "${HOME}"
     fi
 
     # gpg
