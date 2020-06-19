@@ -96,21 +96,21 @@ main() {
         brew cask install firefox
     fi
 
-#    mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
-#    cd "${HOME}"/Source/GitHub/ghacksuserjs
-#
-#    if [[ -d "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
-#        rm -rf "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
-#    fi
-#
-#    git clone https://github.com/ghacksuserjs/ghacks-user.js.git
-#    cd "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
-#
-#    if [[ "$(comm -13 <(sort -u user.js) <(sort -u "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
-#        echo "Obsolete syntax in Firefox user.js file."
-#    fi
-#
-#    cp "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js "${HOME}"/Library/Application\ Support/Firefox/Profiles/*.default-release/
+    mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
+    cd "${HOME}"/Source/GitHub/ghacksuserjs
+
+    if [[ -d "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
+        rm -rf "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
+    fi
+
+    git clone https://github.com/ghacksuserjs/ghacks-user.js.git
+    cd "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
+
+    if [[ "$(comm -13 <(sort -u user.js) <(sort -u "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
+        echo "Obsolete syntax in Firefox user.js file."
+    fi
+
+    cp "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js "${HOME}"/Library/Application\ Support/Firefox/Profiles/*.default-release/
 }
 
 main "$@"
