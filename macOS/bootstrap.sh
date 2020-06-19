@@ -8,11 +8,10 @@ main() {
 
     # system configuration
     mkdir -p "${HOME}"/Source/GitHub/craigsloggett
-    
-    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/scripts ]]; then
-        cd "${HOME}"/Source/GitHub/craigsloggett
-        git clone https://github.com/craigsloggett/scripts.git
-    fi
+
+    cd "${HOME}"/Source/GitHub/craigsloggett
+    rm -rf scripts
+    git clone https://github.com/craigsloggett/scripts.git
 
     cd "${HOME}"/Source/GitHub/craigsloggett/scripts/macOS
 
