@@ -34,23 +34,6 @@ main() {
     # vim
     mkdir -p "${XDG_CACHE_HOME}"/vim
 
-    # dotfiles
-    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
-        cd "${HOME}"/Source/GitHub/craigsloggett
-        git clone -b macOS https://github.com/craigsloggett/dotfiles.git
-    fi
-
-    if [[ ! -f /usr/local/bin/stow ]]; then
-        brew install stow
-    fi
-
-    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
-
-    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
-    do
-        ( stow --verbose --target="${HOME}" $d );
-    done
-
     # gpg
     export GNUPGHOME="${XDG_DATA_HOME:="${HOME}/.local/share"}/gnupg"
 
@@ -74,6 +57,30 @@ main() {
 
     git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
     brew install pass
+
+    # dotfiles
+    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
+        cd "${HOME}"/Source/GitHub/craigsloggett
+        git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+    fi
+
+    if [[ ! -f /usr/local/bin/stow ]]; then
+        brew install stow
+    fi
+
+    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
+
+    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
+    do
+        ( stow --verbose --target="${HOME}" $d );
+    done
+
+    #firefox
+
+    if [[ ! -d /Applications/Firefox.app ]]; then
+        brew cask install firefox
+    fi
+    
 }
 
 main "$@"
