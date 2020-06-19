@@ -41,12 +41,14 @@ main() {
         brew install stow
     fi
 
-    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
-
-    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
-    do
-        ( stow --verbose --target="${HOME}" $d );
-    done
+    if [[ ! -d "${XDG_CONFIG_HOME}"/zsh ]]; then
+        cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
+    
+        for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
+        do
+            ( stow --verbose --target="${HOME}" $d );
+        done
+    fi
 
     # gpg
     export GNUPGHOME="${XDG_DATA_HOME:="${HOME}/.local/share"}/gnupg"
