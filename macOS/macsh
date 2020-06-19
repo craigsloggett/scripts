@@ -69,8 +69,13 @@ main() {
 
     # pass
 
-    git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
-    brew install pass
+    if [[ ! -d "${XDG_DATA_HOME}/pass" ]]; then
+        git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
+    fi
+
+    if [[ ! -f /usr/local/bin/pass ]]; then
+        brew install pass
+    fi
 
     # vim
     mkdir -p "${XDG_CACHE_HOME}"/vim
@@ -80,7 +85,6 @@ main() {
     if [[ ! -d /Applications/Firefox.app ]]; then
         brew cask install firefox
     fi
-    
 }
 
 main "$@"
