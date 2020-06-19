@@ -17,6 +17,10 @@ main() {
     mkdir -p "${XDG_BIN_HOME}"
     mkdir -p "${XDG_LIB_HOME}"
 
+    # ssh
+    ssh-keygen -t ed25519
+    ssh-copy-id nerditup@jupiter.nerditup.ca
+
     # zsh
     find etc -type d | while read -r dir; do
         sudo mkdir -p "${dir}"
