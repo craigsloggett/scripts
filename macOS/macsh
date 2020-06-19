@@ -31,13 +31,27 @@ main() {
 
     mkdir -p "${XDG_DATA_HOME}"/zsh
 
-    # vim
-    mkdir -p "${XDG_CACHE_HOME}"/vim
+    # dotfiles
+    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
+        cd "${HOME}"/Source/GitHub/craigsloggett
+        git clone -b macOS https://github.com/craigsloggett/dotfiles.git
+    fi
+
+    if [[ ! -f /usr/local/bin/stow ]]; then
+        brew install stow
+    fi
+
+    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
+
+    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
+    do
+        ( stow --verbose --target="${HOME}" $d );
+    done
 
     # gpg
     export GNUPGHOME="${XDG_DATA_HOME:="${HOME}/.local/share"}/gnupg"
 
-    mkdir -p  "${GNUPGHOME}"
+    mkdir -p "${GNUPGHOME}"
     cp "${HOME}/Source/GitHub/craigsloggett/dotfiles/gnupg/.local/share/gnupg/gpg.conf" "${GNUPGHOME}"
 
     chmod 700 "${GNUPGHOME}"
@@ -58,22 +72,8 @@ main() {
     git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
     brew install pass
 
-    # dotfiles
-    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
-        cd "${HOME}"/Source/GitHub/craigsloggett
-        git clone -b macOS https://github.com/craigsloggett/dotfiles.git
-    fi
-
-    if [[ ! -f /usr/local/bin/stow ]]; then
-        brew install stow
-    fi
-
-    cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
-
-    for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
-    do
-        ( stow --verbose --target="${HOME}" $d );
-    done
+    # vim
+    mkdir -p "${XDG_CACHE_HOME}"/vim
 
     #firefox
 
