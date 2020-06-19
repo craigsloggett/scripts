@@ -96,6 +96,9 @@ main() {
         brew cask install firefox
     fi
 
+    /Applications/Firefox.app/Contents/MacOS/./firefox &
+    kill -9 "$(pgrep firefox)"
+
     mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
     cd "${HOME}"/Source/GitHub/ghacksuserjs
 
