@@ -96,7 +96,7 @@ main() {
         brew cask install firefox
     fi
 
-    /Applications/Firefox.app/Contents/MacOS/./firefox
+    /Applications/Firefox.app/Contents/MacOS/./firefox &
     sleep 10
     kill -9 "$(pgrep firefox)"
 
