@@ -61,11 +61,11 @@ main() {
         brew install gpg1
     fi
 
-    scp nerditup@jupiter.nerditup.ca:/srv/storage/.security/gnupg/personal/craig_sloggett_private_encrypt.asc .
+    if [[ ! -f craig_sloggett_private_encrypt.asc ]]; then
+        scp nerditup@jupiter.nerditup.ca:/srv/storage/.security/gnupg/personal/craig_sloggett_private_encrypt.asc .
 
-    gpg1 --import craig_sloggett_private_encrypt.asc
-
-    rm craig_sloggett_private_encrypt.asc
+        gpg1 --import craig_sloggett_private_encrypt.asc
+    fi
 
     # pass
 
