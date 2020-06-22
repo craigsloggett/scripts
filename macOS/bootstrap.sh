@@ -55,9 +55,9 @@ main() {
       rm -rf "$SOURCE_PATH/$repo_name"
   fi
 
-  git clone "$REPO_URL"
+  git clone "$REPO_URL" "$SOURCE_PATH/$repo_name"
 
-  cd "$SOURCE_PATH/$repo_name"/macOS
+  cd "$SOURCE_PATH/$repo_name/macOS"
 
   source macsh
 }
