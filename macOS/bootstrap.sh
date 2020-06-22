@@ -47,7 +47,7 @@ main() {
 
   # Get the basename of the repository URL.
   repo_name="${REPO_URL##*/}"
-  repo_name="${REPO_URL%%.*}"
+  repo_name="${repo_name%%.*}"
 
   mkdir -p "$SOURCE_PATH"
 
