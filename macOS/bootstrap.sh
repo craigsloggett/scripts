@@ -80,9 +80,10 @@ main() {
   get_latest_repo "$SCRIPTS_REPO_URL"
 
   repo_name="$(get_repo_name "$SCRIPTS_REPO_URL")"
+  repo_user="$(get_repo_user "$SCRIPTS_REPO_URL")"
 
   # Very specific to my dotfiles repository.
-  cd "$SOURCE_PATH/$repo_name/macOS"
+  cd "$SOURCE_PATH/$repo_user/$repo_name/macOS"
 
   source macsh
 }
