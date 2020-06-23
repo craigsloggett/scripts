@@ -1,122 +1,223 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # macsh - macOS installation shell script.
+#
+# This script can be configured via the use of environment variables.
+#
+# +-------------------+--------------------------------------------+
+# |          Variable | Description                                |
+# +-------------------+--------------------------------------------+
+# |                   |                                            |
+# |      SECRETS_HOST | The server hosting sensitive files.        |
+# |                   |                                            |
+# |      SECRETS_USER | The user with access to sensitive files.   |
+# |                   |                                            |
+# | DOTFILES_REPO_URL | Repository hosting the user dotfiles.      |
+# |                   |                                            |
+# |    GPG_REMOTE_DIR | Remote directory of the GPG private key.   |
+# |                   |                                            |
+# |  GPG_KEY_FILENAME | Filename of the GPG private key to import. |
+# |                   |                                            |
+# |     PASH_REPO_URL | Repository hosting `pash`.                 |
+# |                   |                                            |
+# +-------------------+--------------------------------------------+
+
+die() {
+  printf 'ERROR: %s\n' "$1"
+  exit 1
+}
+
+get_repo_name() {
+  # Get the basename of the repository URL.
+  repo_name="${1##*/}"
+  repo_name="${repo_name%%.*}"
+
+  printf '%s\n' "$repo_name"
+}
+
+get_repo_user() {
+  # Get the GitHub user from the repository URL.
+  repo_user="${1#*github.com/}"; 
+  repo_user="${repo_user%%/*}"; 
+
+  printf '%s\n' "$repo_user"
+}
+
+get_latest_repo() (
+  local repo_name="$(get_repo_name $1)"
+  local repo_user="$(get_repo_user $1)"
+
+  mkdir -p "$SOURCE_PATH/$repo_user"
+  cd "$SOURCE_PATH/$repo_user"
+
+  if [ ! -d "$repo_name" ]; then
+    if [ ! -z "$2" ]; then
+      git clone -b "$2" "$1"
+    else
+      git clone "$1"
+    fi
+  else
+    (
+      cd "$repo_name"
+      git pull
+    )
+  fi
+)
+
+setup_xdg_directories() {
+  # Export the XDG environment variables if they aren't already.
+  export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+  export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+  export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+  export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
+  export XDG_LIB_HOME="${XDG_LIB_HOME:-$HOME/.local/lib}"
+
+  # Create all directories.
+  mkdir -p "$XDG_CONFIG_HOME"
+  mkdir -p "$XDG_CACHE_HOME"
+  mkdir -p "$XDG_DATA_HOME"
+  mkdir -p "$XDG_BIN_HOME"
+  mkdir -p "$XDG_LIB_HOME"
+}
+
+setup_ssh_key() {
+  if [ ! -d "$HOME/.ssh" ]; then
+    ssh-keygen -t ed25519
+  fi
+
+  ssh-copy-id "$SECRETS_USER@$SECRETS_HOST"
+}
+
+setup_system_configuration() {
+  printf '%s\n' "Setting up system configuration and require admin priviledges. Asking for sudo password:"
+  find etc -type d | while read -r dir; do
+    sudo mkdir -p "$dir"
+  done
+
+  find etc ! -type d | while read -r file; do
+    sudo cp "$file" "/$file"
+  done
+}
+
+setup_dotfiles() {
+  local dotfiles_repo_name="$(get_repo_name $DOTFILES_REPO_URL)"
+  local dotfiles_repo_user="$(get_repo_user $DOTFILES_REPO_URL)"
+
+  if [ ! -f /usr/local/bin/stow ]; then
+      brew install stow
+  fi
+
+  if [ ! -d "$XDG_CONFIG_HOME/zsh" ]; then
+    (
+      cd "$SOURCE_PATH/$dotfiles_repo_user/$dotfiles_repo_name"
+  
+      for d in "$(ls | grep -v 'firefox\|README.*')";
+      do
+          ( stow --verbose --target="$HOME" $d );
+      done
+    )
+  fi
+}
+
+setup_zsh() {
+  chmod 755 /usr/local/share/zsh
+  chmod 755 /usr/local/share/zsh/site-functions
+
+  mkdir -p "$XDG_DATA_HOME/zsh"
+}
+
+setup_gpg() {
+  export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
+
+  if [ ! -f /usr/local/bin/gpg1 ]; then
+    brew install gpg1
+  fi
+
+  ## GnuPG handles the configuration file differently...
+  #mkdir -p "$GNUPGHOME"
+  #(
+  #  cd "$SOURCE_PATH/$dotfiles_repo_name"
+  #  cp "gnupg/${GNUPGHOME#$HOME/}/gpg.conf" "$GNUPGHOME"
+  #)
+
+  chmod 700 "$GNUPGHOME"
+  chmod 600 "$GNUPGHOME/gpg.conf"
+
+  rsync -a "$SECRETS_USER@$SECRETS_HOST:$GPG_KEY_REMOTE_DIR/$GPG_KEY_FILENAME" .
+
+  gpg1 --import "$GPG_KEY_FILENAME"
+
+  # Wouldn't want to accidentally commit this file to git.
+  rm "$GPG_KEY_FILENAME"
+}
+
+setup_pash() {
+  export PASH_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pash"
+
+  #get_latest_repo "$DOTFILES_REPO_URL"
+  # symlink to XDG_BIN_HOME
+  #if [ ! -d "$PASH_DIR" ]; then
+
+  #    git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
+  #fi
+
+
+}
 
 main() {
-    # Export the XDG environment variables if they aren't already.
-    export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
-    export XDG_CACHE_HOME="${XDG_CACHE_HOME:-"${HOME}/.cache"}"
-    export XDG_DATA_HOME="${XDG_DATA_HOME:-"${HOME}/.local/share"}"
-    export XDG_BIN_HOME="${XDG_BIN_HOME:-"${HOME}/.local/bin"}"
-    export XDG_LIB_HOME="${XDG_LIB_HOME:-"${HOME}/.local/lib"}"
 
-    # Create all directories beforehand.
-    mkdir -p "${XDG_CONFIG_HOME}"
-    mkdir -p "${XDG_CACHE_HOME}"
-    mkdir -p "${XDG_DATA_HOME}"
-    mkdir -p "${XDG_BIN_HOME}"
-    mkdir -p "${XDG_LIB_HOME}"
+  # Error here if the user has not set SECRETS_HOST.
+  [ "$SECRETS_HOST" ] || die "\$SECRETS_HOST needs to be set."
 
-    # ssh
-    if [[ ! -f "${HOME}"/.ssh/id_ed25519 ]]; then
-        ssh-keygen -t ed25519
-        ssh-copy-id nerditup@jupiter.nerditup.ca
-    fi
+  # Error here if the user has not set SECRETS_USER.
+  [ "$SECRETS_USER" ] || die "\$SECRETS_USER needs to be set."
 
-    # zsh
-    find etc -type d | while read -r dir; do
-        sudo mkdir -p "${dir}"
-    done
+  # Error here if the user has not set DOTFILES_REPO_URL.
+  [ "$DOTFILES_REPO_URL" ] || die "\$DOTFILES_REPO_URL needs to be set."
 
-    find etc ! -type d | while read -r file; do
-        sudo cp "$file" "/${file}"
-    done
 
-    chmod 755 /usr/local/share/zsh
-    chmod 755 /usr/local/share/zsh/site-functions
+  setup_xdg_directories
+  setup_ssh_key
+  setup_system_configuration
 
-    mkdir -p "${XDG_DATA_HOME}"/zsh
+  get_latest_repo "$DOTFILES_REPO_URL" "macOS"
 
-    # dotfiles
-    if [[ ! -d "${HOME}"/Source/GitHub/craigsloggett/dotfiles ]]; then
-        cd "${HOME}"/Source/GitHub/craigsloggett
-        git clone -b macOS https://github.com/craigsloggett/dotfiles.git
-    fi
+  dotfiles_repo_name="$(get_repo_name $DOTFILES_REPO_URL)"
+  setup_gpg
+  setup_dotfiles
+  setup_zsh
+  setup_pash
 
-    if [[ ! -f /usr/local/bin/stow ]]; then
-        brew install stow
-    fi
+  # vim
+  mkdir -p "${XDG_CACHE_HOME}"/vim
 
-    if [[ ! -d "${XDG_CONFIG_HOME}"/zsh ]]; then
-        cd "${HOME}"/Source/GitHub/craigsloggett/dotfiles;
-    
-        for d in "$(ls | grep -v 'firefox\|gnupg\|README.*')";
-        do
-            ( stow --verbose --target="${HOME}" $d );
-        done
+  #firefox
 
-        cd "${HOME}"
-    fi
+  if [[ ! -d /Applications/Firefox.app ]]; then
+      brew cask install firefox
+  fi
 
-    # gpg
-    export GNUPGHOME="${XDG_DATA_HOME:="${HOME}/.local/share"}/gnupg"
+  /Applications/Firefox.app/Contents/MacOS/./firefox &
+  sleep 10
+  kill -9 "$(pgrep firefox)"
+  sleep 5
 
-    mkdir -p "${GNUPGHOME}"
-    cp "${HOME}/Source/GitHub/craigsloggett/dotfiles/gnupg/.local/share/gnupg/gpg.conf" "${GNUPGHOME}"
+  mkdir -p "$HOME"/Source/GitHub/ghacksuserjs
+  cd "$HOME"/Source/GitHub/ghacksuserjs
 
-    chmod 700 "${GNUPGHOME}"
-    chmod 600 "${GNUPGHOME}/gpg.conf"
+  if [[ -d "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
+      rm -rf "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
+  fi
 
-    if [[ ! -f /usr/local/bin/gpg1 ]]; then
-        brew install gpg1
-    fi
+  git clone https://github.com/ghacksuserjs/ghacks-user.js.git
+  cd "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
 
-    if [[ ! -f "${HOME}"/craig_sloggett_private_encrypt.asc ]]; then
-        scp nerditup@jupiter.nerditup.ca:/srv/storage/.security/gnupg/personal/craig_sloggett_private_encrypt.asc "${HOME}"
+  if [[ "$(comm -13 <(sort -u user.js) <(sort -u "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
+      echo "Obsolete syntax in Firefox user.js file."
+  fi
 
-        gpg1 --import "${HOME}"/craig_sloggett_private_encrypt.asc
-    fi
-
-    # pass
-
-    if [[ ! -d "${XDG_DATA_HOME}/pass" ]]; then
-        git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
-    fi
-
-    if [[ ! -f /usr/local/bin/pass ]]; then
-        brew install pass
-    fi
-
-    # vim
-    mkdir -p "${XDG_CACHE_HOME}"/vim
-
-    #firefox
-
-    if [[ ! -d /Applications/Firefox.app ]]; then
-        brew cask install firefox
-    fi
-
-    /Applications/Firefox.app/Contents/MacOS/./firefox &
-    sleep 10
-    kill -9 "$(pgrep firefox)"
-    sleep 5
-
-    mkdir -p "${HOME}"/Source/GitHub/ghacksuserjs
-    cd "${HOME}"/Source/GitHub/ghacksuserjs
-
-    if [[ -d "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
-        rm -rf "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
-    fi
-
-    git clone https://github.com/ghacksuserjs/ghacks-user.js.git
-    cd "${HOME}"/Source/GitHub/ghacksuserjs/ghacks-user.js
-
-    if [[ "$(comm -13 <(sort -u user.js) <(sort -u "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
-        echo "Obsolete syntax in Firefox user.js file."
-    fi
-
-    cd "${HOME}"/Library/Application\ Support/Firefox/Profiles/*.default-release/
-    cp "${HOME}"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
+  cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
+  cp "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
 }
 
 main "$@"

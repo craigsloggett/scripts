@@ -4,25 +4,42 @@
 #
 # This script can be configured via the use of environment variables.
 #
-# +------------------+-----------------------------------------+
-# |         Variable | Description                             |
-# +------------------+-----------------------------------------+
-# |                  |                                         |
-# |      SOURCE_PATH | The path to the source directory.       |
-# |                  |                                         |
-# |         REPO_URL | Repository for the installation script. |
-# |                  |                                         |
-# | INSTALL_HOMEBREW | Install the Homebrew package manager.   |
-# |                  |                                         |
-# +------------------+-----------------------------------------+
-
-log() {
-  printf '%s %s\n' "${2:-->}" "$1" >&2
-}
+# +------------------+---------------------------------------------+
+# |         Variable | Description                                 |
+# +------------------+---------------------------------------------+
+# |                  |                                             |
+# |      SOURCE_PATH | The path to the source directory.           |
+# |                  |                                             |
+# | SCRIPTS_REPO_URL | Repository hosting the installation script. |
+# |                  |                                             |
+# | INSTALL_HOMEBREW | Install the Homebrew package manager.       |
+# |                  |                                             |
+# +------------------+---------------------------------------------+
 
 die() {
-  log "$1" "${2:-ERROR}"
+  printf 'ERROR: %s\n' "$1"
   exit 1
+}
+
+get_repo_name() {
+  # Get the basename of the repository URL.
+  repo_name="${SCRIPTS_REPO_URL##*/}"
+  repo_name="${repo_name%%.*}"
+
+  printf '%s\n' "$repo_name"
+}
+
+get_latest_scripts() {
+  mkdir -p "$SOURCE_PATH"
+
+  if [ ! -d "$SOURCE_PATH/$repo_name" ]; then
+    git clone "$SCRIPTS_REPO_URL" "$SOURCE_PATH/$repo_name"
+  else
+    (
+      cd "$SOURCE_PATH/$repo_name"
+      git pull
+    )
+  fi
 }
 
 install_homebrew() {
@@ -36,26 +53,18 @@ main() {
   set -o nounset
 
   # Error here if the user has not set SOURCE_PATH.
-  [ "$SOURCE_PATH" ] || die "\$SOURCE_PATH needs to be set"
+  [ "$SOURCE_PATH" ] || die "\$SOURCE_PATH needs to be set."
 
-  # Error here if the user has not set REPO_URL.
-  [ "$REPO_URL" ] || die "\$REPO_URL needs to be set"
+  # Error here if the user has not set SCRIPTS_REPO_URL.
+  [ "$SCRIPTS_REPO_URL" ] || die "\$SCRIPTS_REPO_URL needs to be set."
 
   # Allow the user to not install the Homebrew package manager as part 
   # of the bootstrap process. Homebrew is a requirement.
   [ "$INSTALL_HOMEBREW" = 0 ] || install_homebrew
 
-  # Get the basename of the repository URL.
-  repo_name="${REPO_URL##*/}"
-  repo_name="${repo_name%%.*}"
+  repo_name=$(get_repo_name)
 
-  mkdir -p "$SOURCE_PATH"
-
-  if [[ -d "$SOURCE_PATH/$repo_name" ]]; then
-      rm -rf "$SOURCE_PATH/$repo_name"
-  fi
-
-  git clone "$REPO_URL" "$SOURCE_PATH/$repo_name"
+  get_latest_scripts
 
   cd "$SOURCE_PATH/$repo_name/macOS"
 
