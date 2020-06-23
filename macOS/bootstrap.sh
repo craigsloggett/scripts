@@ -48,7 +48,7 @@ get_latest_repo() (
   cd "$SOURCE_PATH/$repo_user"
 
   if [ ! -d "$repo_name" ]; then
-    if [ -n "$2" ]; then
+    if [ -n "${2:-}" ]; then
       git clone -b "$2" "$1"
     else
       git clone "$1"
