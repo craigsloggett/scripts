@@ -28,6 +28,8 @@ die() {
 }
 
 get_repo_name() {
+  local repo_name
+
   # Get the basename of the repository URL.
   repo_name="${1##*/}"
   repo_name="${repo_name%%.*}"
@@ -36,6 +38,8 @@ get_repo_name() {
 }
 
 get_repo_user() {
+  local repo_user
+
   # Get the GitHub user from the repository URL.
   repo_user="${1#*github.com/}"; 
   repo_user="${repo_user%%/*}"; 
@@ -44,14 +48,17 @@ get_repo_user() {
 }
 
 get_latest_repo() (
-  local repo_name="$(get_repo_name $1)"
-  local repo_user="$(get_repo_user $1)"
+  local repo_name
+  local repo_user
+
+  repo_name="$(get_repo_name "$1")"
+  repo_user="$(get_repo_user "$1")"
 
   mkdir -p "$SOURCE_PATH/$repo_user"
   cd "$SOURCE_PATH/$repo_user"
 
   if [ ! -d "$repo_name" ]; then
-    if [ ! -z "$2" ]; then
+    if [ -n "$2" ]; then
       git clone -b "$2" "$1"
     else
       git clone "$1"
@@ -100,7 +107,7 @@ setup_system_configuration() {
 }
 
 setup_dotfiles() {
-  local dotfiles_repo_name="$(get_repo_name $DOTFILES_REPO_URL)"
+  local dotfiles_repo_name="$(get_repo_name "$DOTFILES_REPO_URL")"
   local dotfiles_repo_user="$(get_repo_user $DOTFILES_REPO_URL)"
 
   if [ ! -f /usr/local/bin/stow ]; then

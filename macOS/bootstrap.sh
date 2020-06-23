@@ -29,18 +29,37 @@ get_repo_name() {
   printf '%s\n' "$repo_name"
 }
 
-get_latest_scripts() {
-  mkdir -p "$SOURCE_PATH"
+get_repo_user() {
+  # Get the GitHub user from the repository URL.
+  repo_user="${1#*github.com/}"; 
+  repo_user="${repo_user%%/*}"; 
 
-  if [ ! -d "$SOURCE_PATH/$repo_name" ]; then
-    git clone "$SCRIPTS_REPO_URL" "$SOURCE_PATH/$repo_name"
+  printf '%s\n' "$repo_user"
+}
+
+get_latest_repo() (
+  local repo_name
+  local repo_user
+
+  repo_name="$(get_repo_name "$1")"
+  repo_user="$(get_repo_user "$1")"
+
+  mkdir -p "$SOURCE_PATH/$repo_user"
+  cd "$SOURCE_PATH/$repo_user"
+
+  if [ ! -d "$repo_name" ]; then
+    if [ -n "$2" ]; then
+      git clone -b "$2" "$1"
+    else
+      git clone "$1"
+    fi
   else
     (
-      cd "$SOURCE_PATH/$repo_name"
+      cd "$repo_name"
       git pull
     )
   fi
-}
+)
 
 install_homebrew() {
   # Homebrew (taken from their website)
@@ -62,10 +81,11 @@ main() {
   # of the bootstrap process. Homebrew is a requirement.
   [ "$INSTALL_HOMEBREW" = 0 ] || install_homebrew
 
-  repo_name=$(get_repo_name)
+  get_latest_repo "$SCRIPTS_REPO_URL"
 
-  get_latest_scripts
+  repo_name="$(get_repo_name "$SCRIPTS_REPO_URL")"
 
+  # Very specific to my dotfiles repository.
   cd "$SOURCE_PATH/$repo_name/macOS"
 
   source macsh
