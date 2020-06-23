@@ -172,16 +172,9 @@ setup_pash() {
 }
 
 main() {
-
-  # Error here if the user has not set SECRETS_HOST.
-  [ "$SECRETS_HOST" ] || die "\$SECRETS_HOST needs to be set."
-
-  # Error here if the user has not set SECRETS_USER.
-  [ "$SECRETS_USER" ] || die "\$SECRETS_USER needs to be set."
-
-  # Error here if the user has not set DOTFILES_REPO_URL.
-  [ "$DOTFILES_REPO_URL" ] || die "\$DOTFILES_REPO_URL needs to be set."
-
+  # Globally enable exit-on-error and require variables to be set.
+  set -o errexit
+  set -o nounset
 
   setup_xdg_directories
   setup_ssh_key
