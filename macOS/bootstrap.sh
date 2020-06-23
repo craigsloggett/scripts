@@ -73,12 +73,6 @@ main() {
   set -o errexit
   set -o nounset
 
-  # Error here if the user has not set SOURCE_PATH.
-  [ "$SOURCE_PATH" ] || die "\$SOURCE_PATH needs to be set."
-
-  # Error here if the user has not set SCRIPTS_REPO_URL.
-  [ "$SCRIPTS_REPO_URL" ] || die "\$SCRIPTS_REPO_URL needs to be set."
-
   # Allow the user to not install the Homebrew package manager as part 
   # of the bootstrap process. Homebrew is a requirement.
   [ "$INSTALL_HOMEBREW" = 0 ] || install_homebrew
