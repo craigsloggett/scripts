@@ -4,23 +4,23 @@
 #
 # This script can be configured via the use of environment variables.
 #
-# +-------------------+--------------------------------------------+
-# |          Variable | Description                                |
-# +-------------------+--------------------------------------------+
-# |                   |                                            |
-# |      SECRETS_HOST | The server hosting sensitive files.        |
-# |                   |                                            |
-# |      SECRETS_USER | The user with access to sensitive files.   |
-# |                   |                                            |
-# | DOTFILES_REPO_URL | Repository hosting the user dotfiles.      |
-# |                   |                                            |
-# |    GPG_REMOTE_DIR | Remote directory of the GPG private key.   |
-# |                   |                                            |
-# |  GPG_KEY_FILENAME | Filename of the GPG private key to import. |
-# |                   |                                            |
-# |     PASH_REPO_URL | Repository hosting `pash`.                 |
-# |                   |                                            |
-# +-------------------+--------------------------------------------+
+# +--------------------+--------------------------------------------+
+# |           Variable | Description                                |
+# +--------------------+--------------------------------------------+
+# |                    |                                            |
+# |       SECRETS_HOST | The server hosting sensitive files.        |
+# |                    |                                            |
+# |       SECRETS_USER | The user with access to sensitive files.   |
+# |                    |                                            |
+# |  DOTFILES_REPO_URL | Repository hosting the user dotfiles.      |
+# |                    |                                            |
+# | GPG_KEY_REMOTE_DIR | Remote directory of the GPG private key.   |
+# |                    |                                            |
+# |   GPG_KEY_FILENAME | Filename of the GPG private key to import. |
+# |                    |                                            |
+# |      PASH_REPO_URL | Repository hosting `pash`.                 |
+# |                    |                                            |
+# +--------------------+--------------------------------------------+
 
 die() {
   printf 'ERROR: %s\n' "$1"
@@ -141,14 +141,13 @@ setup_gpg() {
   fi
 
   ## GnuPG handles the configuration file differently...
-  #mkdir -p "$GNUPGHOME"
+  mkdir -p "$GNUPGHOME"
   #(
   #  cd "$SOURCE_PATH/$dotfiles_repo_name"
   #  cp "gnupg/${GNUPGHOME#$HOME/}/gpg.conf" "$GNUPGHOME"
   #)
 
   chmod 700 "$GNUPGHOME"
-  chmod 600 "$GNUPGHOME/gpg.conf"
 
   rsync -a "$SECRETS_USER@$SECRETS_HOST:$GPG_KEY_REMOTE_DIR/$GPG_KEY_FILENAME" .
 
