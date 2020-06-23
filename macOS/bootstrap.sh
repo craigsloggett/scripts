@@ -62,6 +62,8 @@ get_latest_repo() (
 )
 
 install_homebrew() {
+  printf '%s\n' "Asking for sudo password in order to install Homebrew."
+
   # Homebrew (taken from their website)
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 }
