@@ -142,10 +142,6 @@ setup_gpg() {
 
   ## GnuPG handles the configuration file differently...
   mkdir -p "$GNUPGHOME"
-  #(
-  #  cd "$SOURCE_PATH/$dotfiles_repo_name"
-  #  cp "gnupg/${GNUPGHOME#$HOME/}/gpg.conf" "$GNUPGHOME"
-  #)
 
   chmod 700 "$GNUPGHOME"
 
