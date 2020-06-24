@@ -20,6 +20,8 @@
 # |                    |                                            |
 # |      PASH_REPO_URL | Repository hosting `pash`.                 |
 # |                    |                                            |
+# |    PASH_REMOTE_DIR | Remote directory of the password-store.    |
+# |                    |                                            |
 # +--------------------+--------------------------------------------+
 
 die() {
@@ -108,7 +110,9 @@ setup_system_configuration() {
 
 setup_dotfiles() {
   local dotfiles_repo_name="$(get_repo_name "$DOTFILES_REPO_URL")"
-  local dotfiles_repo_user="$(get_repo_user $DOTFILES_REPO_URL)"
+  local dotfiles_repo_user="$(get_repo_user "$DOTFILES_REPO_URL")"
+
+  get_latest_repo "$DOTFILES_REPO_URL" "macOS"
 
   if [ ! -f /usr/local/bin/stow ]; then
       brew install stow
@@ -117,6 +121,22 @@ setup_dotfiles() {
   if [ ! -d "$XDG_CONFIG_HOME/zsh" ]; then
     (
       cd "$SOURCE_PATH/$dotfiles_repo_user/$dotfiles_repo_name"
+
+      # GnuPG is special, we have to put the config next to the key database,
+      # but we don't want to commit the key database to git. Making the directory
+      # prior to running `stow` will ensure only the gpg.conf file is symlinked
+      # not the parent directory.
+      if [ -d gnupg ]; then
+        (
+          cd gnupg
+          # Get the GnuPG directory (GNUPGHOME) from the dotfiles hierarchy.
+          gnupg_dir="$(find . -name 'gpg.conf')"
+          gnupg_dir="${gnupg_dir##./}"
+          gnupg_dir="${gnupg_dir%%/gpg.conf}"
+
+          mkdir -p "$gnupg_dir"
+        )
+      fi
   
       for d in "$(ls | grep -v 'firefox\|README.*')";
       do
@@ -161,8 +181,44 @@ setup_pash() {
   cp "$SOURCE_PATH/$repo_user/pash/pash" "$XDG_BIN_HOME/pash"
 
   if [ ! -d "$PASH_DIR" ]; then
-    git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "$PASH_DIR"
+    git clone "$SECRETS_USER@$SECRETS_HOST:$PASH_REMOTE_DIR" "$PASH_DIR"
   fi
+}
+
+setup_vim() {
+  # VIM is mostly setup with dotfiles, not much else to do.
+  mkdir -p "${XDG_CACHE_HOME}"/vim
+}
+
+setup_firefox() {
+  ##firefox
+
+  #if [[ ! -d /Applications/Firefox.app ]]; then
+  #    brew cask install firefox
+  #fi
+
+  #/Applications/Firefox.app/Contents/MacOS/./firefox &
+  #sleep 10
+  #kill -9 "$(pgrep firefox)"
+  #sleep 5
+
+  #mkdir -p "$HOME"/Source/GitHub/ghacksuserjs
+  #cd "$HOME"/Source/GitHub/ghacksuserjs
+
+  #if [[ -d "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
+  #    rm -rf "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
+  #fi
+
+  #git clone https://github.com/ghacksuserjs/ghacks-user.js.git
+  #cd "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
+
+  #if [[ "$(comm -13 <(sort -u user.js) <(sort -u "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
+  #    echo "Obsolete syntax in Firefox user.js file."
+  #fi
+
+  #cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
+  #cp "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
+
 }
 
 main() {
@@ -174,44 +230,13 @@ main() {
   setup_ssh_key
   setup_system_configuration
 
-  get_latest_repo "$DOTFILES_REPO_URL" "macOS"
-
-  dotfiles_repo_name="$(get_repo_name $DOTFILES_REPO_URL)"
-  setup_gpg
   setup_dotfiles
+
+  setup_gpg
   setup_zsh
   setup_pash
-
-  # vim
-  mkdir -p "${XDG_CACHE_HOME}"/vim
-
-  #firefox
-
-  if [[ ! -d /Applications/Firefox.app ]]; then
-      brew cask install firefox
-  fi
-
-  /Applications/Firefox.app/Contents/MacOS/./firefox &
-  sleep 10
-  kill -9 "$(pgrep firefox)"
-  sleep 5
-
-  mkdir -p "$HOME"/Source/GitHub/ghacksuserjs
-  cd "$HOME"/Source/GitHub/ghacksuserjs
-
-  if [[ -d "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
-      rm -rf "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
-  fi
-
-  git clone https://github.com/ghacksuserjs/ghacks-user.js.git
-  cd "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
-
-  if [[ "$(comm -13 <(sort -u user.js) <(sort -u "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
-      echo "Obsolete syntax in Firefox user.js file."
-  fi
-
-  cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
-  cp "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
+  setup_vim
+  setup_firefox
 }
 
 main "$@"
