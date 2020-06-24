@@ -137,7 +137,7 @@ setup_gpg() {
   export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
 
   if [ ! -f /usr/local/bin/gpg1 ]; then
-    brew install gpg1
+    brew install gpg
   fi
 
   ## GnuPG handles the configuration file differently...
@@ -147,7 +147,7 @@ setup_gpg() {
 
   rsync -a "$SECRETS_USER@$SECRETS_HOST:$GPG_KEY_REMOTE_DIR/$GPG_KEY_FILENAME" .
 
-  gpg1 --import "$GPG_KEY_FILENAME"
+  gpg --import "$GPG_KEY_FILENAME"
 
   # Wouldn't want to accidentally commit this file to git.
   rm "$GPG_KEY_FILENAME"
@@ -158,7 +158,7 @@ setup_pash() {
 
   get_latest_repo "$PASH_REPO_URL"
 
-  ln -s "$SOURCE_PATH/$repo_user/pash/pash" "$XDG_BIN_HOME/pash"
+  cp "$SOURCE_PATH/$repo_user/pash/pash" "$XDG_BIN_HOME/pash"
 
   if [ ! -d "$PASH_DIR" ]; then
     git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "$PASH_DIR"
