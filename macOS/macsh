@@ -156,11 +156,11 @@ setup_gpg() {
 setup_pash() {
   export PASH_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pash"
 
-  #get_latest_repo "$DOTFILES_REPO_URL"
+  get_latest_repo "$PASH_REPO_URL"
   # symlink to XDG_BIN_HOME
-  #if [ ! -d "$PASH_DIR" ]; then
 
-  #    git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
+  #if [ ! -d "$PASH_DIR" ]; then
+    #git clone nerditup@jupiter.nerditup.ca:/srv/storage/.security/pass/password-store "${XDG_DATA_HOME}/pass"
   #fi
 
 
