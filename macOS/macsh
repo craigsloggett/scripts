@@ -219,6 +219,7 @@ setup_firefox() {
   #cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
   #cp "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
 
+  sleep 1
 }
 
 main() {
