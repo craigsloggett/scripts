@@ -80,7 +80,7 @@ setup_system_configuration() {
   printf '%s\n' "Asking for sudo password:"
 
   find etc -type d | while read -r dir; do
-    sudo mkdir -p "$dir"
+    sudo mkdir -p "/$dir"
   done
 
   find etc ! -type d | while read -r file; do
@@ -107,7 +107,6 @@ setup_dotfiles() {
       # prior to running `stow` will ensure only the gpg.conf file is symlinked
       # not the parent directory.
       if [ -d gnupg ]; then
-        # Get the GnuPG directory (GNUPGHOME) from the dotfiles hierarchy.
         gnupg_dir="$(find . -name 'gpg.conf')"
         gnupg_dir="${gnupg_dir##./gnupg/}"
         gnupg_dir="${gnupg_dir%%/gpg.conf}"
@@ -115,6 +114,7 @@ setup_dotfiles() {
         mkdir -p "$HOME/$gnupg_dir"
       fi
   
+      # Firefox is not going to be symlinked.
       for dir in ./*; do
         if [ "$dir" != "./firefox" ] && [ "$dir" != "./README.md" ]; then
           ( stow --verbose --target="$HOME" "${dir##./}" )
@@ -146,12 +146,9 @@ setup_gnupg() {
     brew install gnupg
   fi
 
-  # GnuPG handles the configuration file differently...
   mkdir -p "$GNUPGHOME"
   chmod 700 "$GNUPGHOME"
-
   rsync -a "$SECRETS_USER@$SECRETS_HOST:$GPG_KEY_REMOTE_DIR/$GPG_KEY_FILENAME" .
-
   gpg --import "$GPG_KEY_FILENAME"
 
   # Wouldn't want to accidentally commit this file to git.
@@ -205,7 +202,6 @@ setup_firefox() {
     sleep 5
   fi
 
-  # The user.js file will set most of the privacy settings automatically.
   (
     cd "$HOME/Library/Application Support/Firefox/Profiles/"*.default-release
     cp "$(find "$SOURCE_PATH" -name 'user.js')" .
