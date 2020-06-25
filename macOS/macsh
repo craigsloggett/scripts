@@ -86,7 +86,9 @@ setup_xdg_directories() {
 }
 
 setup_system_configuration() {
-  printf '%s\n' "Setting up system configuration and require admin priviledges. Asking for sudo password:"
+  printf '%s\n' "Writing to /etc/ requires admin priviledges."
+  printf '%s\n' "Asking for sudo password:"
+
   find etc -type d | while read -r dir; do
     sudo mkdir -p "$dir"
   done
