@@ -224,7 +224,7 @@ main() {
   set -o errexit
   set -o nounset
 
-#  setup_xdg_directories
+  setup_xdg_directories
 #  setup_system_configuration
 #  setup_dotfiles
 #
