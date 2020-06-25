@@ -116,8 +116,9 @@ setup_dotfiles() {
       fi
   
       for dir in ./*; do
-        [ $dir != "./firefox" ] && [ $dir != "./README.md" ] || continue
-        ( stow --verbose --target="$HOME" "${dir##./}" )
+        if [ $dir != "./firefox" ] && [ $dir != "./README.md" ]; then
+          ( stow --verbose --target="$HOME" "${dir##./}" )
+        fi
       done
     )
   fi
