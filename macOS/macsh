@@ -7,6 +7,7 @@
 # +--------------------+--------------------------------------------+
 # |           Variable | Description                                |
 # +--------------------+--------------------------------------------+
+# |                    |                                            |
 # |        SOURCE_PATH | The path to the source directory.          |
 # |                    |                                            |
 # |       SECRETS_HOST | The server hosting sensitive files.        |
