@@ -24,11 +24,6 @@
 # |                    |                                            |
 # +--------------------+--------------------------------------------+
 
-die() {
-  printf 'ERROR: %s\n' "$1"
-  exit 1
-}
-
 get_repo_name() {
   local repo_name
 
@@ -153,11 +148,11 @@ setup_zsh() {
 setup_gnupg() {
   export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
 
-  if [ ! -f /usr/local/bin/gpg1 ]; then
+  if [ ! -f /usr/local/bin/gpg ]; then
     brew install gnupg
   fi
 
-  ## GnuPG handles the configuration file differently...
+  # GnuPG handles the configuration file differently...
   mkdir -p "$GNUPGHOME"
   chmod 700 "$GNUPGHOME"
 
@@ -209,14 +204,16 @@ setup_firefox() {
   fi
 
   # Firefox must be run once before the default-release folder is generated.
-  /Applications/Firefox.app/Contents/MacOS/./firefox &
-  sleep 10
-  kill -9 "$(pgrep firefox)"
-  sleep 3
+  if [[ ! -d "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/" ]]; then
+    /Applications/Firefox.app/Contents/MacOS/./firefox &
+    sleep 10
+    kill -9 "$(pgrep firefox)"
+    sleep 3
+  fi
 
   # The user.js file will set most of the privacy settings automatically.
   (
-    cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
+    cd "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/"
     cp "$(find "$SOURCE_PATH" -name 'user.js')" .
   )
 }
