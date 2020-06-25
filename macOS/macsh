@@ -204,7 +204,7 @@ setup_firefox() {
   fi
 
   # Firefox must be run once before the default-release folder is generated.
-  if [ ! -d "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/" ]; then
+  if [ ! -d "$HOME/Library/Application Support/Firefox/Profiles/"*.default-release ]; then
     /Applications/Firefox.app/Contents/MacOS/./firefox &
     sleep 10
     kill -9 "$(pgrep firefox)"
@@ -213,7 +213,7 @@ setup_firefox() {
 
   # The user.js file will set most of the privacy settings automatically.
   (
-    cd "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/"
+    cd "$HOME/Library/Application Support/Firefox/Profiles/"*.default-release
     cp "$(find "$SOURCE_PATH" -name 'user.js')" .
   )
 }
