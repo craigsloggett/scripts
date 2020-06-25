@@ -224,13 +224,13 @@ main() {
   set -o errexit
   set -o nounset
 
-  setup_xdg_directories
-  setup_system_configuration
-  setup_dotfiles
-
-  setup_ssh
-  setup_gnupg
-  setup_zsh
+#  setup_xdg_directories
+#  setup_system_configuration
+#  setup_dotfiles
+#
+#  setup_ssh
+#  setup_gnupg
+#  setup_zsh
   setup_pash
   setup_vim
   setup_firefox
