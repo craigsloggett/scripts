@@ -47,17 +47,15 @@ get_latest_repo() (
   mkdir -p "$SOURCE_PATH/$repo_user"
   cd "$SOURCE_PATH/$repo_user"
 
-  if [ ! -d "$repo_name" ]; then
+  if [ -d "$repo_name" ]; then
+    cd "$repo_name"
+    git pull
+  else
     if [ -n "${2:-}" ]; then
       git clone -b "$2" "$1"
     else
       git clone "$1"
     fi
-  else
-    (
-      cd "$repo_name"
-      git pull
-    )
   fi
 )
 
