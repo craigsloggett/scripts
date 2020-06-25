@@ -208,6 +208,12 @@ setup_firefox() {
   )
 }
 
+setup_security() {
+  # Firewall
+  sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+  sudo launchctl load /System/Library/LaunchDaemons/com.apple.alf.agent.plist 2>/dev/null
+}
+
 main() {
   # Globally enable exit-on-error and require variables to be set.
   set -o errexit
@@ -223,6 +229,7 @@ main() {
   setup_pass
   setup_vim
   setup_firefox
+  setup_security
 }
 
 main "$@"
