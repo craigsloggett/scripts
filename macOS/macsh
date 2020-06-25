@@ -148,11 +148,11 @@ setup_zsh() {
   mkdir -p "$XDG_DATA_HOME/zsh"
 }
 
-setup_gpg() {
+setup_gnupg() {
   export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
 
   if [ ! -f /usr/local/bin/gpg1 ]; then
-    brew install gpg
+    brew install gnupg
   fi
 
   ## GnuPG handles the configuration file differently...
@@ -170,9 +170,12 @@ setup_gpg() {
 setup_pash() {
   export PASH_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pash"
 
+  local pash_repo_name="$(get_repo_name "$PASH_REPO_URL")"
+  local pash_repo_user="$(get_repo_user "$PASH_REPO_URL")"
+
   get_latest_repo "$PASH_REPO_URL"
 
-  cp "$SOURCE_PATH/$repo_user/pash/pash" "$XDG_BIN_HOME/pash"
+  cp "$SOURCE_PATH/$pash_repo_user/$pash_repo_name/pash" "$XDG_BIN_HOME/pash"
 
   if [ ! -d "$PASH_DIR" ]; then
     git clone "$SECRETS_USER@$SECRETS_HOST:$PASH_REMOTE_DIR" "$PASH_DIR"
@@ -226,7 +229,7 @@ main() {
   setup_dotfiles
 
   setup_ssh
-  setup_gpg
+  setup_gnupg
   setup_zsh
   setup_pash
   setup_vim
