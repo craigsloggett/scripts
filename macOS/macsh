@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # macsh - macOS installation shell script.
 #
@@ -25,8 +25,6 @@
 # +--------------------+--------------------------------------------+
 
 get_repo_name() {
-  local repo_name
-
   # Get the basename of the repository URL.
   repo_name="${1##*/}"
   repo_name="${repo_name%%.*}"
@@ -35,8 +33,6 @@ get_repo_name() {
 }
 
 get_repo_user() {
-  local repo_user
-
   # Get the GitHub user from the repository URL.
   repo_user="${1#*github.com/}"; 
   repo_user="${repo_user%%/*}"; 
@@ -45,9 +41,6 @@ get_repo_user() {
 }
 
 get_latest_repo() (
-  local repo_name
-  local repo_user
-
   repo_name="$(get_repo_name "$1")"
   repo_user="$(get_repo_user "$1")"
 
@@ -96,8 +89,8 @@ setup_system_configuration() {
 }
 
 setup_dotfiles() {
-  local dotfiles_repo_name="$(get_repo_name "$DOTFILES_REPO_URL")"
-  local dotfiles_repo_user="$(get_repo_user "$DOTFILES_REPO_URL")"
+  dotfiles_repo_name="$(get_repo_name "$DOTFILES_REPO_URL")"
+  dotfiles_repo_user="$(get_repo_user "$DOTFILES_REPO_URL")"
 
   get_latest_repo "$DOTFILES_REPO_URL" "macOS"
 
@@ -122,9 +115,8 @@ setup_dotfiles() {
         mkdir -p "$HOME/$gnupg_dir"
       fi
   
-      for d in "$(ls | grep -v 'firefox\|README.*')";
-      do
-          ( stow --verbose --target="$HOME" $d );
+      for dir in ./*/; do
+        [ "$dir" != "./firefox/" ] || ( stow --verbose --target="$HOME" "$dir" )
       done
     )
   fi
@@ -179,17 +171,17 @@ setup_pass() {
 setup_pash() {
   export PASH_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pash"
 
-  local pash_repo_url="https://github.com/dylanaraps/pash.git"
-  local pash_repo_name="$(get_repo_name "$pash_repo_url")"
-  local pash_repo_user="$(get_repo_user "$pash_repo_url")"
-  local pash_remote_dir="$PASS_REMOTE_DIR"
+  pash_repo_url="https://github.com/dylanaraps/pash.git"
+  pash_repo_name="$(get_repo_name "$pash_repo_url")"
+  pash_repo_user="$(get_repo_user "$pash_repo_url")"
+  pash_remote_dir="$PASS_REMOTE_DIR"
 
   get_latest_repo "$pash_repo_url"
 
   cp "$SOURCE_PATH/$pash_repo_user/$pash_repo_name/pash" "$XDG_BIN_HOME/pash"
 
   if [ ! -d "$PASH_DIR" ]; then
-    git clone "$SECRETS_USER@$SECRETS_HOST:$pass_remote_dir" "$PASH_DIR"
+    git clone "$SECRETS_USER@$SECRETS_HOST:$pash_remote_dir" "$PASH_DIR"
   fi
 }
 
@@ -204,7 +196,7 @@ setup_firefox() {
   fi
 
   # Firefox must be run once before the default-release folder is generated.
-  if [ ! -d "$HOME/Library/Application Support/Firefox/Profiles/"*.default-release ]; then
+  if [ ! -d "$HOME/Library/Application Support/Firefox/Profiles/" ]; then
     /Applications/Firefox.app/Contents/MacOS/./firefox &
     sleep 10
     kill -9 "$(pgrep firefox)"
