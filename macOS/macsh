@@ -89,14 +89,6 @@ setup_xdg_directories() {
   mkdir -p "$XDG_LIB_HOME"
 }
 
-setup_ssh_key() {
-  if [ ! -d "$HOME/.ssh" ]; then
-    ssh-keygen -t ed25519
-  fi
-
-  ssh-copy-id "$SECRETS_USER@$SECRETS_HOST"
-}
-
 setup_system_configuration() {
   printf '%s\n' "Setting up system configuration and require admin priviledges. Asking for sudo password:"
   find etc -type d | while read -r dir; do
@@ -127,15 +119,12 @@ setup_dotfiles() {
       # prior to running `stow` will ensure only the gpg.conf file is symlinked
       # not the parent directory.
       if [ -d gnupg ]; then
-        (
-          cd gnupg
-          # Get the GnuPG directory (GNUPGHOME) from the dotfiles hierarchy.
-          gnupg_dir="$(find . -name 'gpg.conf')"
-          gnupg_dir="${gnupg_dir##./}"
-          gnupg_dir="${gnupg_dir%%/gpg.conf}"
+        # Get the GnuPG directory (GNUPGHOME) from the dotfiles hierarchy.
+        gnupg_dir="$(find . -name 'gpg.conf')"
+        gnupg_dir="${gnupg_dir##./gnupg/}"
+        gnupg_dir="${gnupg_dir%%/gpg.conf}"
 
-          mkdir -p "$gnupg_dir"
-        )
+        mkdir -p "$HOME/$gnupg_dir"
       fi
   
       for d in "$(ls | grep -v 'firefox\|README.*')";
@@ -144,6 +133,14 @@ setup_dotfiles() {
       done
     )
   fi
+}
+
+setup_ssh() {
+  if [ ! -d "$HOME/.ssh" ]; then
+    ssh-keygen -t ed25519
+  fi
+
+  ssh-copy-id "$SECRETS_USER@$SECRETS_HOST"
 }
 
 setup_zsh() {
@@ -228,16 +225,15 @@ main() {
   set -o nounset
 
   setup_xdg_directories
-  setup_ssh_key
   setup_system_configuration
-
   setup_dotfiles
 
-  setup_gpg
-  setup_zsh
-  setup_pash
-  setup_vim
-  setup_firefox
+#  setup_ssh
+#  setup_gpg
+#  setup_zsh
+#  setup_pash
+#  setup_vim
+#  setup_firefox
 }
 
 main "$@"
