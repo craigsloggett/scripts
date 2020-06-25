@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # bootstrap.sh - macOS installation shell script.
 #
@@ -38,9 +38,6 @@ get_repo_user() {
 }
 
 get_latest_repo() (
-  local repo_name
-  local repo_user
-
   repo_name="$(get_repo_name "$1")"
   repo_user="$(get_repo_user "$1")"
 
@@ -83,7 +80,7 @@ main() {
   # Very specific to my dotfiles repository.
   cd "$SOURCE_PATH/$repo_user/$repo_name/macOS"
 
-  source macsh
+  ./macsh
 }
 
 main "$@"
