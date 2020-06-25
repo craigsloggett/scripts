@@ -266,7 +266,8 @@ setup_terminal() {
   defaults write com.apple.terminal StringEncodings -array 4
 
   open "$XDG_CONFIG_HOME/terminal/Google.terminal"
-  defaults write com.apple.terminal "Default Window Settings" "Google"
+  defaults write com.apple.Terminal "Default Window Settings" -string "Google"
+  defaults write com.apple.Terminal "Startup Window Settings" -string "Google"
 }
 
 setup_misc() {
