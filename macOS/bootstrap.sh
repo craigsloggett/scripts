@@ -16,11 +16,6 @@
 # |                  |                                             |
 # +------------------+---------------------------------------------+
 
-die() {
-  printf 'ERROR: %s\n' "$1"
-  exit 1
-}
-
 get_repo_name() {
   # Get the basename of the repository URL.
   repo_name="${SCRIPTS_REPO_URL##*/}"
