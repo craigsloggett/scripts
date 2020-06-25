@@ -7,6 +7,7 @@
 # +--------------------+--------------------------------------------+
 # |           Variable | Description                                |
 # +--------------------+--------------------------------------------+
+# |        SOURCE_PATH | The path to the source directory.          |
 # |                    |                                            |
 # |       SECRETS_HOST | The server hosting sensitive files.        |
 # |                    |                                            |
@@ -202,35 +203,21 @@ setup_vim() {
 }
 
 setup_firefox() {
-  ##firefox
+  if [[ ! -d /Applications/Firefox.app ]]; then
+    brew cask install firefox
+  fi
 
-  #if [[ ! -d /Applications/Firefox.app ]]; then
-  #    brew cask install firefox
-  #fi
+  # Firefox must be run once before the default-release folder is generated.
+  /Applications/Firefox.app/Contents/MacOS/./firefox &
+  sleep 10
+  kill -9 "$(pgrep firefox)"
+  sleep 3
 
-  #/Applications/Firefox.app/Contents/MacOS/./firefox &
-  #sleep 10
-  #kill -9 "$(pgrep firefox)"
-  #sleep 5
-
-  #mkdir -p "$HOME"/Source/GitHub/ghacksuserjs
-  #cd "$HOME"/Source/GitHub/ghacksuserjs
-
-  #if [[ -d "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js ]]; then
-  #    rm -rf "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
-  #fi
-
-  #git clone https://github.com/ghacksuserjs/ghacks-user.js.git
-  #cd "$HOME"/Source/GitHub/ghacksuserjs/ghacks-user.js
-
-  #if [[ "$(comm -13 <(sort -u user.js) <(sort -u "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js))" ]]; then
-  #    echo "Obsolete syntax in Firefox user.js file."
-  #fi
-
-  #cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
-  #cp "$HOME"/Source/GitHub/craigsloggett/dotfiles/firefox/user.js .
-
-  sleep 1
+  # The user.js file will set most of the privacy settings automatically.
+  (
+    cd "$HOME"/Library/Application\ Support/Firefox/Profiles/*.default-release/
+    cp "$(find "$SOURCE_PATH" -name 'user.js')" .
+  )
 }
 
 main() {
