@@ -18,9 +18,7 @@
 # |                    |                                            |
 # |   GPG_KEY_FILENAME | Filename of the GPG private key to import. |
 # |                    |                                            |
-# |      PASH_REPO_URL | Repository hosting `pash`.                 |
-# |                    |                                            |
-# |    PASH_REMOTE_DIR | Remote directory of the password-store.    |
+# |    PASS_REMOTE_DIR | Remote directory of the password-store.    |
 # |                    |                                            |
 # +--------------------+--------------------------------------------+
 
@@ -167,18 +165,32 @@ setup_gnupg() {
   rm "$GPG_KEY_FILENAME"
 }
 
+setup_pass() {
+  export PASSWORD_STORE_DIR="${XDG_DATA_HOME:="${HOME}/.local/share"}/pass"
+
+  if [[ ! -f /usr/local/bin/pass ]]; then
+    brew install pass
+  fi
+
+  if [[ ! -d "${XDG_DATA_HOME}/pass" ]]; then
+    git clone "$SECRETS_USER@$SECRETS_HOST:$PASS_REMOTE_DIR" "$PASSWORD_STORE_DIR"
+  fi
+}
+
 setup_pash() {
   export PASH_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pash"
 
-  local pash_repo_name="$(get_repo_name "$PASH_REPO_URL")"
-  local pash_repo_user="$(get_repo_user "$PASH_REPO_URL")"
+  local pash_repo_url="https://github.com/dylanaraps/pash.git"
+  local pash_repo_name="$(get_repo_name "$pash_repo_url")"
+  local pash_repo_user="$(get_repo_user "$pash_repo_url")"
+  local pash_remote_dir="$PASS_REMOTE_DIR"
 
-  get_latest_repo "$PASH_REPO_URL"
+  get_latest_repo "$pash_repo_url"
 
   cp "$SOURCE_PATH/$pash_repo_user/$pash_repo_name/pash" "$XDG_BIN_HOME/pash"
 
   if [ ! -d "$PASH_DIR" ]; then
-    git clone "$SECRETS_USER@$SECRETS_HOST:$PASH_REMOTE_DIR" "$PASH_DIR"
+    git clone "$SECRETS_USER@$SECRETS_HOST:$pass_remote_dir" "$PASH_DIR"
   fi
 }
 
@@ -225,18 +237,16 @@ main() {
   set -o nounset
 
   setup_xdg_directories
-#  setup_system_configuration
-#  setup_dotfiles
-#
-#  setup_ssh
-#  setup_gnupg
-#  setup_zsh
-  setup_pash
+  setup_system_configuration
+  setup_dotfiles
+
+  setup_ssh
+  setup_gnupg
+  setup_zsh
+  setup_pass
   setup_vim
   setup_firefox
 }
 
 main "$@"
-
-# Setup Firefox
 
