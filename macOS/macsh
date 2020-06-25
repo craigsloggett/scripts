@@ -274,9 +274,6 @@ setup_misc() {
   # Disable the sudden motion sensor as it’s not useful for SSDs
   sudo pmset -a sms 0
   
-  # Disable local Time Machine backups
-  hash tmutil &> /dev/null && sudo tmutil disablelocal
-
   # Save to disk (not to iCloud) by default:
   defaults write -g NSDocumentSaveNewDocumentsToCloud -bool false 
 
