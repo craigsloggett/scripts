@@ -114,7 +114,6 @@ setup_dotfiles() {
         mkdir -p "$HOME/$gnupg_dir"
       fi
   
-      # Firefox is not going to be symlinked.
       for dir in ./*; do
         if [ "$dir" != "./firefox" ] && [ "$dir" != "./README.md" ]; then
           ( stow --verbose --target="$HOME" "${dir##./}" )
@@ -265,6 +264,9 @@ setup_finder() {
 setup_terminal() {
   # Only use UTF-8 in Terminal.app
   defaults write com.apple.terminal StringEncodings -array 4
+
+  open "$XDG_CONFIG_HOME/terminal/Google.terminal"
+  defaults write com.apple.terminal "Default Window Settings" "Google"
 }
 
 setup_misc() {
