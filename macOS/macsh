@@ -159,7 +159,6 @@ setup_gpg() {
 
   ## GnuPG handles the configuration file differently...
   mkdir -p "$GNUPGHOME"
-
   chmod 700 "$GNUPGHOME"
 
   rsync -a "$SECRETS_USER@$SECRETS_HOST:$GPG_KEY_REMOTE_DIR/$GPG_KEY_FILENAME" .
@@ -228,12 +227,12 @@ main() {
   setup_system_configuration
   setup_dotfiles
 
-#  setup_ssh
-#  setup_gpg
-#  setup_zsh
-#  setup_pash
-#  setup_vim
-#  setup_firefox
+  setup_ssh
+  setup_gpg
+  setup_zsh
+  setup_pash
+  setup_vim
+  setup_firefox
 }
 
 main "$@"
