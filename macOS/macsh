@@ -83,7 +83,7 @@ setup_xdg_directories() {
 }
 
 setup_system_configuration() {
-  printf '%s\n' "Writing to /etc/ requires admin priviledges."
+  printf '%s\n' "Writing to /etc requires admin priviledges."
   printf '%s\n' "Asking for sudo password:"
 
   find etc -type d | while read -r dir; do
@@ -167,11 +167,11 @@ setup_gnupg() {
 setup_pass() {
   export PASSWORD_STORE_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pass"
 
-  if [[ ! -f /usr/local/bin/pass ]]; then
+  if [ ! -f /usr/local/bin/pass ]; then
     brew install pass
   fi
 
-  if [[ ! -d "${XDG_DATA_HOME}/pass" ]]; then
+  if [ ! -d "$PASSWORD_STORE_DIR" ]; then
     git clone "$SECRETS_USER@$SECRETS_HOST:$PASS_REMOTE_DIR" "$PASSWORD_STORE_DIR"
   fi
 }
@@ -195,20 +195,20 @@ setup_pash() {
 
 setup_vim() {
   # VIM is mostly setup with dotfiles, not much else to do.
-  mkdir -p "${XDG_CACHE_HOME}"/vim
+  mkdir -p "$XDG_CACHE_HOME/vim"
 }
 
 setup_firefox() {
-  if [[ ! -d /Applications/Firefox.app ]]; then
+  if [ ! -d /Applications/Firefox.app ]; then
     brew cask install firefox
   fi
 
   # Firefox must be run once before the default-release folder is generated.
-  if [[ ! -d "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/" ]]; then
+  if [ ! -d "$HOME/Library/Application\ Support/Firefox/Profiles/*.default-release/" ]; then
     /Applications/Firefox.app/Contents/MacOS/./firefox &
     sleep 10
     kill -9 "$(pgrep firefox)"
-    sleep 3
+    sleep 5
   fi
 
   # The user.js file will set most of the privacy settings automatically.
