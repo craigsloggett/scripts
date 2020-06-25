@@ -115,8 +115,9 @@ setup_dotfiles() {
         mkdir -p "$HOME/$gnupg_dir"
       fi
   
-      for dir in ./*/; do
-        [ "$dir" != "./firefox/" ] || ( stow --verbose --target="$HOME" "$dir" )
+      for dir in ./*; do
+        [ $dir != "./firefox" ] && [ $dir != "./README.md" ] || continue
+        ( stow --verbose --target="$HOME" "${dir##./}" )
       done
     )
   fi
