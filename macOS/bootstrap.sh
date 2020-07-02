@@ -55,6 +55,7 @@ install_homebrew() {
   printf '%s\n' "Asking for sudo password in order to install Homebrew."
 
   # Homebrew (taken from their website)
+  # https://developer.apple.com/download/more/
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 }
 
