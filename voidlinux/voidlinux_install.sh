@@ -106,7 +106,16 @@ xbps-install -S -R "${repo_url}" -r /mnt base-system
 # Clone pass store to ~/.local/share/pass
 # Configure git (username, email)
 
+# Setup xbps-src
+# Install curl
+# `sudo xbps-install xtools`
+# Clone void-packages git repository
+# `mkdir -p ~/src/github.com/void-linux/`
+# `cd ~/src/github.com/void-linux/`
+# `git clone git://github.com/void-linux/void-packages.git`
+
 # Configure X11
+# `sudo xbps-install xorg-minimal`
 
 
 # ... automate building the kernel when updating
