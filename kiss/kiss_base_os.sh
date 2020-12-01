@@ -26,6 +26,9 @@ hostname='xps';
 username='nerditup';
 password='testpass';
 
+# KISS
+release='2020.9-2';
+
 #########################################################
 # Useful Functions
 #########################################################
@@ -123,35 +126,39 @@ mount_partitions  # Mount the Partitions
 
 status_update 'Disk';
 
+# Download the Latest Release
+url="https://github.com/kisslinux/repo/releases/download/$release"
+wget "$url/kiss-chroot-$release.tar.xz"
+
 # Install Packages
 # TODO: Determine which packages to install.
 
 status_update 'Packages';
 
-# Configure the System
-configure_fstab       # Configure the fstab File
-configure_timezone    # Configure the Timezone
-configure_timesync    # Configure the Timesync Service
-configure_hostname    # Configure the Hostname
-configure_network     # Configure the Network
-configure_user        # Configure the Non-root User
-configure_bootloader  # Configure the EFI Bootloader
-
-status_update 'System';
-
-# VirtualBox or Physical
-if [ "$virtualbox" = true ]
-then {
-    :
-}
-else
-    # Setup Dell XPS Related Modules
-    # TODO: Implement this.
-fi
-
-# Root
-set_root_password  # Set the root password
-
-status_update 'Root Password';
+## Configure the System
+#configure_fstab       # Configure the fstab File
+#configure_timezone    # Configure the Timezone
+#configure_timesync    # Configure the Timesync Service
+#configure_hostname    # Configure the Hostname
+#configure_network     # Configure the Network
+#configure_user        # Configure the Non-root User
+#configure_bootloader  # Configure the EFI Bootloader
+#
+#status_update 'System';
+#
+## VirtualBox or Physical
+#if [ "$virtualbox" = true ]
+#then {
+#    :
+#}
+#else
+#    # Setup Dell XPS Related Modules
+#    # TODO: Implement this.
+#fi
+#
+## Root
+#set_root_password  # Set the root password
+#
+#status_update 'Root Password';
 
 echo 'Installation Completed. Please Restart the Machine.';
