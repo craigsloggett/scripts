@@ -100,7 +100,7 @@ setup_dotfiles() {
 
   if [ ! -d "$XDG_CONFIG_HOME/zsh" ]; then
     (
-      cd "$SOURCE_PATH/$dotfiles_repo_user/$dotfiles_repo_name"
+      cd "$SOURCE_PATH/$dotfiles_repo_user/$dotfiles_repo_name/macOS"
 
       # GnuPG is special, we have to put the config next to the key database,
       # but we don't want to commit the key database to git. Making the directory
