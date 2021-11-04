@@ -210,8 +210,6 @@ Install Dotfiles
    - $ mkdir -p ~/Source/GitHub/nerditup
  - Git clone the dotfiles repository
    - $ cd ~/Source/GitHub/nerditup && git clone git@github.com:nerditup/dotfiles.git
- - Symlink GnuPG configuration
-   - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/gnupg/.local/share/gnupg/gpg.conf ~/.local/share/gnupg/gpg.conf
 
 Configure ZSH
 -------------
@@ -249,6 +247,9 @@ Cleanup
    - Symlink git configuration
      - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/git/.config/git ~/.config/git
    - Create ~/.config/git/config-personal with email and signing key configured.
+ - gnupg
+   - Symlink GnuPG configuration
+     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/gnupg/.local/share/gnupg/gpg.conf ~/.local/share/gnupg/gpg.conf
  - less
    - Create the less history directory
      - $ mkdir -p ~/.local/share/less
