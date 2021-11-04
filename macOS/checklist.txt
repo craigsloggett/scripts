@@ -1,0 +1,272 @@
+Prepare the OS
+--------------
+ - Rename user to have capital letter.
+   - Create a new temporary admin account
+   - Go to "Advanced Settings" for the user we want to change.
+   - Update the account name to have a capital letter.
+   - Update the Home Directory to have a capital letter.
+   - Rename the Home Directory to match the capital letter.
+
+ - Remove all applications from the Dock except for the following:
+   - Browser
+   - Mail
+   - Calendar
+   - Contacts
+   - Reminders
+   - Notes
+   - Music
+
+ - Add a Directory named "Source" in Home
+   - Change the icon to "DeveloperFolderIcon.icns" found in,
+     - /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/
+
+ - Install Homebrew
+   - Paste the following into the macOS Terminal,
+     - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+System Preferences
+------------------
+ - Apple ID
+   - Login
+     - Uncheck all iCloud options except for:
+       - Reminders
+       - Notes
+ - Internet Accounts
+   - Login to Microsoft Exchange
+     - Uncheck all options except for:
+       - Mail
+       - Contacts
+       - Calendars
+ - Software Update
+   - Check "Automatically keep my Mac up to date"
+ - Passwords
+   - Deselect "Detect compromised passwords"
+ - Bluetooth
+   - Select "Show Bluetooth in menu bar"
+ - Sound
+   - Select "Show Sound in menu bar: Always" under Output
+ - Displays
+   - Relocate the menu bar to the secondary monitor.
+   - Configure Night Shift for Custom Schedule (5:00PM - 9:00AM)
+ - Keyboard
+   - Update Key Repeat to the fastest setting
+   - Update Delay Until Repeat to the second from the shortest setting
+   - Touch Bar shows "Expanded Control Strip"
+   - Press fn key to "Show Emoji & Symbols"
+ - Dock & Menu Bar
+   - Adjust size to be smaller (to taste)
+   - Uncheck "Show recent applications in Dock"
+ - Spotlight
+   - Uncheck all Search Results categories except for the following:
+     - Applications
+     - Calculator
+     - Conversion
+     - Definition
+     - System Preferences
+ - Security & Privacy
+   - Turn on Firewall
+   - Turn on FileVault
+
+Application Preferences
+-----------------------
+ - Finder
+   - General
+     - Update "New Finder windows show:" to Home
+   - Sidebar
+     - Uncheck all "Favourites" options except for the following:
+       - Applications
+       - Downloads
+       - Home
+     - Uncheck all "iCloud" options.
+     - Uncheck all "Tags" options.
+   - Advanced
+     - Check "Keep folders on top: In windows when sorting by name"
+
+ - Safari
+   - Start Page Settings
+     - Uncheck all options except for "Privacy Report"
+   - General
+     - Remove history items: After one day
+     - Remove download list items: When Safari quits
+     - Uncheck "Open "safe" files after downloading".
+   - AutoFill
+     - Uncheck all AutoFill web forms options.
+   - Search
+     - Select DuckDuckGo as the Search engine
+     - Uncheck "Include search engine suggestions"
+     - Uncheck all options in Smart Search Field except for "Show Favorites"
+   - Security
+     - Uncheck "Warn when visiting a fraudulent website"
+   - Privacy
+     - Check "Block all cookies"
+     - Uncheck "Allow websites to check for Apple Pay and Apple Card
+     - Uncheck "Allow privacy-preserving measurements of ad effectiveness"
+   - Advanced
+     - Check "Show full website address"
+
+ - TextEdit
+   - New Document
+     - Format
+       - Select "Plain Text"
+     - Options
+       - Uncheck everything
+   - Open and Save
+     - When Opening a File
+       - Check "Display HTML files as HTML code instead of formatted text"
+     - When Saving a File  
+       - Uncheck "Add ".txt" extension to plain text files"
+
+ - Mail
+   - ...
+
+ - Calendar
+   - ...
+
+Configure SSH
+-------------
+ - Create an SSH Key
+   - $ ssh-keygen -t ed25519
+ - Copy SSH Key to Server
+   - $ ssh-copy-id user@my-server-ip
+
+Install GnuPG and Import Keys
+-----------------------------
+ - Requires SSH
+ - Install gnupg with Homebrew
+   - $ brew install gnupg
+ - Copy GPG Keys from Server
+   - $ cd ~/Downloads && scp user@my-server-ip:/key/directory/secret-subkeys.gpg .
+ - Import the GPG Keys
+   - $ mkdir -p ~/.local/share/gnupg
+   - $ chmod 700 ~/.local/share/gnupg
+   - $ GNUPGHOME=~/.local/share/gnupg gpg --import ~/Downloads/secret-subkeys.gpg
+
+Install Pass and Git Clone Password Store
+-----------------------------------------
+ - Requires SSH, GnuPG
+ - Install pass with Homebrew
+   - $ brew install pass
+ - Git clone the Password Store repository
+   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pass
+ - Test Pass Works
+   - $ GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=~/.local/share/pass pass somepassword
+
+Install and Configure Firefox
+-----------------------------
+ - Requires Pass
+ - Install Firefox with Homebrew
+   - $ brew install --cask firefox
+ - Open Firefox to create a profile directory then close it.
+ - Download the user.js file from the dotfiles repo
+   - $ cd ~/Downloads && curl -O -L "https://raw.githubusercontent.com/nerditup/dotfiles/master/macOS/firefox/user.js"
+ - Copy the user.js file to the Firefox profile directory.
+   - $ cp ~/Downloads/user.js ~/Library/Application\ Support/Firefox/Profiles/xxxxxxxx.default-release
+ - Login to Sync turning syncing on only for Bookmarks
+ - Preferences
+   - General
+     - Uncheck "Recommend extensions as you browse"
+     - Uncheck "Recommend features as you browse"
+   - Home
+     - Uncheck all options under "Firefox Home Content"
+   - Search
+     - Set "DuckDuckGo" as the Default Search Engine
+     - Uncheck all options under "Search Suggestions"
+     - Delete all Search Shortcuts except for "DuckDuckGo"
+   - Privacy & Security
+     - Set "Enhanced Tracking Protection" to Strict
+     - Set "Send websites a "Do Not Track" signal that you don't want to be tracked" to Always
+     - Uncheck all options under "Logins and Passwords"
+     - Uncheck all options under "History" except:
+       - "Remember browsing and download history"
+       - "Clear history when Firefox closes" with all "Settings..." checked except:
+         - Browsing & download history
+         - Cookies
+     - Uncheck all options under "Address Bar" except:
+       - Browsing history
+       - Bookmarks
+   - Uncheck all options under "Firefox Data Collection and Use"
+ - Install the following Extensions:
+   - Firefox Multi-Account Containers
+   - ClearURLs
+   - Cookie AutoDelete
+     - Copy CAD settings from Server
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/CAD_CoreSettings_2021-01-05_09.06.36.json .
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/CAD_Expressions_2021-01-05_09.07.20.json .
+     - Import Core settings into the extension
+     - Import Expressions settings into the extension
+   - Decentraleyes
+   - NoScript
+     - Copy NoScript settings from Server
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/noscript_data-2021-11-02.txt .
+     - Import settings into the extension
+   - uBlock Origin
+     - Enable, update and apply changes for all filters
+
+Install Dotfiles
+----------------
+ - Requires Firefox, SSH, Pass
+ - Login to GitHub and add SSH key.
+ - Prepare the dotfiles source directory
+   - $ mkdir -p ~/Source/GitHub/nerditup
+ - Git clone the dotfiles repository
+   - $ cd ~/Source/GitHub/nerditup && git clone git@github.com:nerditup/dotfiles.git
+ - Symlink GnuPG configuration
+   - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/gnupg/.local/share/gnupg/gpg.conf ~/.local/share/gnupg/gpg.conf
+
+Configure ZSH
+-------------
+ - Create the XDG Directories
+   - $ mkdir -p ~/.config
+   - $ mkdir -p ~/.cache
+   - $ mkdir -p ~/.local/share
+   - $ mkdir -p ~/.local/bin
+   - $ mkdir -p ~/.local/lib
+ - $ chmod 755 /usr/local/share/zsh
+ - $ chmod 755 /usr/local/share/zsh/site-functions
+ - $ mkdir -p ~/.local/share/zsh
+ - TODO: Confirm what is in /etc/zshenv on a fresh install and update this.
+   - $ echo 'export ZDOTDIR="${HOME}/.config/zsh"' >> /etc/zshenv
+ - Symlink ZSH configuration
+   - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/zsh/.config/zsh ~/.config/zsh
+ - Close the Terminal and re-open.
+ - TODO: Determine files left behind from fresh install and clean them up
+   - $ rm zsh files in ~
+
+Cleanup
+-------
+ - Terminal
+   - Import profile found in:
+     - ~/Source/GitHub/nerditup/dotfiles/macOS/terminal/.config/terminal/Google.terminal
+ - vim
+   - Create the cache and data directories
+     - $ mkdir -p ~/.cache/vim
+     - $ mkdir -p ~/.local/share/vim
+   - Symlink vim configuration
+     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/vim/.config/vim ~/.config/vim
+   - TODO: Determine files left behind from fresh install and clean them up
+     - $ rm vim files in ~
+ - git
+   - Symlink git configuration
+     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/git/.config/git ~/.config/git
+   - Create ~/.config/git/config-personal with email and signing key configured.
+ - less
+   - Create the less history directory
+     - $ mkdir -p ~/.local/share/less
+   - Cleanup
+     - $ rm ~/.lesshst  # (may not exist if less never used)
+
+
+Install Additional Applications
+-------------------------------
+
+ - Install Rectangle with Homebrew
+   - $ brew install --cask rectangle
+   - Settings
+     - Configure "Almost Maximize" to be ^⌘⏎
+     - Check "Hide menu bar icon"
+     - Check "Check for updates automatically"
+     - Set "Gaps between windows" to 10 px
+
+Setup Development Environment
+-----------------------------
+...
