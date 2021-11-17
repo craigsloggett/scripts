@@ -54,7 +54,7 @@ Install Pass and Git Clone Password Store
    - $ mkdir -p ~/.local/share/pash
    - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pash
  - Test Pash Works
-   - $ GNUPGHOME=~/.local/share/gnupg PASH_CLIP=pbcopy pash somepassword
+   - $ GNUPGHOME=~/.local/share/gnupg PASH_CLIP=pbcopy pash s somepassword
 
 System Preferences
 ------------------
