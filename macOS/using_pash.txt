@@ -1,0 +1,8 @@
+export PASH_CLIP='pbcopy'
+export PASH_DIR=~/.local/share/pass
+
+cp pash ~/.local/bin/pash
+
+install gnupg@1.4 or whatever
+
+try it out
