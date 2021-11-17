@@ -24,6 +24,35 @@ Prepare the OS
    - Paste the following into the macOS Terminal,
      - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+Configure SSH
+-------------
+ - Create an SSH Key
+   - $ ssh-keygen -t ed25519
+ - Copy SSH Key to Server
+   - $ ssh-copy-id user@my-server-ip
+
+Install GnuPG and Import Keys
+-----------------------------
+ - Requires SSH
+ - Install gnupg with Homebrew
+   - $ brew install gnupg
+ - Copy GPG Keys from Server
+   - $ cd ~/Downloads && scp user@my-server-ip:/key/directory/secret-subkeys.gpg .
+ - Import the GPG Keys
+   - $ mkdir -p ~/.local/share/gnupg
+   - $ chmod 700 ~/.local/share/gnupg
+   - $ GNUPGHOME=~/.local/share/gnupg gpg --import ~/Downloads/secret-subkeys.gpg
+
+Install Pass and Git Clone Password Store
+-----------------------------------------
+ - Requires SSH, GnuPG
+ - Install pass with Homebrew
+   - $ brew install pass
+ - Git clone the Password Store repository
+   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pass
+ - Test Pass Works
+   - $ GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=~/.local/share/pass pass somepassword
+
 System Preferences
 ------------------
  - Apple ID
@@ -121,35 +150,6 @@ Application Preferences
 
  - Calendar
    - ...
-
-Configure SSH
--------------
- - Create an SSH Key
-   - $ ssh-keygen -t ed25519
- - Copy SSH Key to Server
-   - $ ssh-copy-id user@my-server-ip
-
-Install GnuPG and Import Keys
------------------------------
- - Requires SSH
- - Install gnupg with Homebrew
-   - $ brew install gnupg
- - Copy GPG Keys from Server
-   - $ cd ~/Downloads && scp user@my-server-ip:/key/directory/secret-subkeys.gpg .
- - Import the GPG Keys
-   - $ mkdir -p ~/.local/share/gnupg
-   - $ chmod 700 ~/.local/share/gnupg
-   - $ GNUPGHOME=~/.local/share/gnupg gpg --import ~/Downloads/secret-subkeys.gpg
-
-Install Pass and Git Clone Password Store
------------------------------------------
- - Requires SSH, GnuPG
- - Install pass with Homebrew
-   - $ brew install pass
- - Git clone the Password Store repository
-   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pass
- - Test Pass Works
-   - $ GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=~/.local/share/pass pass somepassword
 
 Install and Configure Firefox
 -----------------------------
