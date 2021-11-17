@@ -35,7 +35,7 @@ Install GnuPG and Import Keys
 -----------------------------
  - Requires SSH
  - Install gnupg with Homebrew
-   - $ brew install gnupg
+   - $ brew install gnupg@1.4
  - Copy GPG Keys from Server
    - $ cd ~/Downloads && scp user@my-server-ip:/key/directory/secret-subkeys.gpg .
  - Import the GPG Keys
@@ -46,12 +46,15 @@ Install GnuPG and Import Keys
 Install Pass and Git Clone Password Store
 -----------------------------------------
  - Requires SSH, GnuPG
- - Install pass with Homebrew
-   - $ brew install pass
+ - Download and Install Pash from GitHub
+   - $ mkdir -p ~/.local/bin
+   - $ curl -L -O "https://raw.githubusercontent.com/dylanaraps/pash/master/pash"
+   - $ chmod +x ~/.local/bin/pash
  - Git clone the Password Store repository
-   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pass
- - Test Pass Works
-   - $ GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=~/.local/share/pass pass somepassword
+   - $ mkdir -p ~/.local/share/pash
+   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pash
+ - Test Pash Works
+   - $ GNUPGHOME=~/.local/share/gnupg PASH_CLIP=pbcopy pash somepassword
 
 System Preferences
 ------------------
