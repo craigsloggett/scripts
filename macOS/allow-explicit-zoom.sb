@@ -1,0 +1,51 @@
+;; This is my first sandbox configuration file!
+(version 1) 
+
+(allow default)
+(deny file-write*)
+
+;;(deny default)
+
+;; Let's allow file read and write in specific locations and not 
+;; all over my filesystem!
+;; Please note you can add more (regex "^/Users/user_name/xxxxxxxxxxx") lines depending 
+;; on what your MyApp needs to function properly.
+(allow file-write* file-read-data file-read-metadata
+  (regex "^/Applications/zoom.us.app")
+  (regex "^(/private)?/tmp"))
+
+;;  (regex "^/Users/Craig/Library/Application Support/zoom.us.app")
+
+;; You can also add a separate section for reading and writing files outside your
+;; user_name account directory.
+;;(allow file-read-data file-read-metadata
+;;  (regex "^/dev/autofs.*")
+;;  (regex "^/System/Library")
+;;  (regex "^/usr/lib")
+;;  (regex "^/var"))
+
+;;  (regex "^/dev/u?random$")
+;;  (regex "^/dev/null$")
+;;  (regex "^(/private)?/var/run/syslog$")
+
+;; If your MyApp requires to access sysctl (in read)
+;;(allow mach* sysctl-read)
+
+;; If you want to import extra rules from 
+;; an existing sandbox configuration file: 
+;;(import "/usr/share/sandbox/bsd.sb")
+
+;; If you want to decide in which filesystem paths 
+;; MyApp is forbidden to write:
+;;(deny file-write-data
+;;  (regex #"^(/private)?/etc/localtime$"
+;;    #"^/usr/share/nls/"
+;;    #"^/usr/share/zoneinfo/"))
+
+;; If your MyApp wants to run extra processes it's be allowed to run only
+;; child processes and nothing else
+;;(allow process-exec 
+;;  (regex "^/Applications/zoom.us.app"))
+;;
+;; If your MyApp requires network access you can grant it here:
+;;(allow network*)
