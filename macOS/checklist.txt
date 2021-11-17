@@ -187,6 +187,7 @@ Install and Configure Firefox
    - Uncheck all options under "Firefox Data Collection and Use"
  - Install the following Extensions:
    - Firefox Multi-Account Containers
+   - Dark Reader
    - ClearURLs
    - Cookie AutoDelete
      - Copy CAD settings from Server
@@ -271,3 +272,7 @@ Install Additional Applications
 Setup Development Environment
 -----------------------------
 ...
+brew install shellcheck
+brew install tmux
+brew install --cask utm
+brew install --cask microsoft-teams
