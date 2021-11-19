@@ -11,10 +11,8 @@ Prepare the OS
    - Browser
    - Mail
    - Calendar
-   - Contacts
    - Reminders
    - Notes
-   - Music
 
  - Add a Directory named "Source" in Home
    - Change the icon to "DeveloperFolderIcon.icns" found in,
@@ -35,26 +33,25 @@ Install GnuPG and Import Keys
 -----------------------------
  - Requires SSH
  - Install gnupg with Homebrew
-   - $ brew install gnupg@1.4
+   - $ brew install gnupg
  - Copy GPG Keys from Server
    - $ cd ~/Downloads && scp user@my-server-ip:/key/directory/secret-subkeys.gpg .
  - Import the GPG Keys
    - $ mkdir -p ~/.local/share/gnupg
    - $ chmod 700 ~/.local/share/gnupg
    - $ GNUPGHOME=~/.local/share/gnupg gpg --import ~/Downloads/secret-subkeys.gpg
+   - $ GNUPGHOME=~/.local/share/gnupg gpg --edit-key <KEY>  # set the trust level
 
 Install Pass and Git Clone Password Store
 -----------------------------------------
  - Requires SSH, GnuPG
- - Download and Install Pash from GitHub
-   - $ mkdir -p ~/.local/bin
-   - $ curl -L -O "https://raw.githubusercontent.com/dylanaraps/pash/master/pash"
-   - $ chmod +x ~/.local/bin/pash
+ - Download and Install Pass with Homebrew
+   - $ brew install pass
  - Git clone the Password Store repository
-   - $ mkdir -p ~/.local/share/pash
-   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pash
+   - $ mkdir -p ~/.local/share/pass
+   - $ git clone user@my-server-ip:/pass/directory/password-store.git ~/.local/share/pass
  - Test Pash Works
-   - $ GNUPGHOME=~/.local/share/gnupg PASH_CLIP=pbcopy pash s somepassword
+   - $ GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=/Users/Craig/.local/share/pass pass
 
 System Preferences
 ------------------
@@ -98,6 +95,11 @@ System Preferences
  - Security & Privacy
    - Turn on Firewall
    - Turn on FileVault
+ - Mouse
+   - Uncheck "Scroll direction: Natural"
+ - Battery
+   - Power Adapter
+     - Check "Prevent your Mac from automatically sleeping when the display is off"
 
 Application Preferences
 -----------------------
@@ -109,7 +111,9 @@ Application Preferences
        - Applications
        - Downloads
        - Home
+       - Desktop
      - Uncheck all "iCloud" options.
+     - Check "User's MacBook Pro" option under Locations.
      - Uncheck all "Tags" options.
    - Advanced
      - Check "Keep folders on top: In windows when sorting by name"
@@ -231,22 +235,23 @@ Configure ZSH
  - Symlink ZSH configuration
    - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/zsh/.config/zsh ~/.config/zsh
  - Close the Terminal and re-open.
- - TODO: Determine files left behind from fresh install and clean them up
-   - $ rm zsh files in ~
+ - Clean up left-over ZSH files.
+   - $ rm ~/.zsh_history
+   - $ rm -rf ~/.zsh_sessions
 
 Cleanup
 -------
  - Terminal
    - Import profile found in:
-     - ~/Source/GitHub/nerditup/dotfiles/macOS/terminal/.config/terminal/Google.terminal
+     - ~/Source/GitHub/nerditup/dotfiles/macOS/terminal/Google.terminal
  - vim
    - Create the cache and data directories
      - $ mkdir -p ~/.cache/vim
      - $ mkdir -p ~/.local/share/vim
    - Symlink vim configuration
      - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/vim/.config/vim ~/.config/vim
-   - TODO: Determine files left behind from fresh install and clean them up
-     - $ rm vim files in ~
+   - Clean up left-over Vim files.
+     - $ rm ~/.viminfo
  - git
    - Symlink git configuration
      - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/git/.config/git ~/.config/git
@@ -271,11 +276,14 @@ Install Additional Applications
      - Check "Hide menu bar icon"
      - Check "Check for updates automatically"
      - Set "Gaps between windows" to 10 px
+ - Install tmux with Homebrew
+   - $ brew install tmux
+   - Symlink tmux configuration
+     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/tmux/.config/tmux ~/.config/tmux
 
 Setup Development Environment
 -----------------------------
 ...
 brew install shellcheck
-brew install tmux
 brew install --cask utm
 brew install --cask microsoft-teams
