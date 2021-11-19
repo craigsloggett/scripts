@@ -164,8 +164,8 @@ Install and Configure Firefox
  - Install Firefox with Homebrew
    - $ brew install --cask firefox
  - Open Firefox to create a profile directory then close it.
- - Download the user.js file from the dotfiles repo
-   - $ cd ~/Downloads && curl -O -L "https://raw.githubusercontent.com/nerditup/dotfiles/master/macOS/firefox/user.js"
+ - Copy Firefox (user.js) settings from Server
+   - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/user.js .
  - Copy the user.js file to the Firefox profile directory.
    - $ cp ~/Downloads/user.js ~/Library/Application\ Support/Firefox/Profiles/xxxxxxxx.default-release
  - Login to Sync turning syncing on only for Bookmarks
@@ -195,22 +195,27 @@ Install and Configure Firefox
  - Install the following Extensions:
    - Firefox Multi-Account Containers
    - Dark Reader
+   - Decentraleyes
    - ClearURLs
+     - Copy ClearURLs settings from Server
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/ClearURLs\ -\ YYYY-MM-DD.conf .
+     - Import settings into the extension
    - Cookie AutoDelete
      - Copy CAD settings from Server
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/CAD_CoreSettings_2021-01-05_09.06.36.json .
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/CAD_Expressions_2021-01-05_09.07.20.json .
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Cookie\ AutoDelete\ Core\ -\ YYYY-MM-DD.json .
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Cookie\ AutoDelete\ Expressions\ -\ YYYY-MM-DD.json .
      - Import Core settings into the extension
      - Import Expressions settings into the extension
-   - Decentraleyes
    - NoScript
      - Copy NoScript settings from Server
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/noscript_data-2021-11-02.txt .
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/NoScript\ -\ YYYY-MM-DD.txt .
      - Import settings into the extension
    - uBlock Origin
-     - Enable, update and apply changes for all filters
+     - Copy uBlock Origin settings from Server
+       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/uBlock\ Origin\ -\ YYYY-MM-DD.txt .
+     - Import settings into the extension
 
-Install Dotfiles
+Clone Dotfiles
 ----------------
  - Requires Firefox, SSH, Pass
  - Login to GitHub and add SSH key.
@@ -230,8 +235,9 @@ Configure ZSH
  - $ chmod 755 /usr/local/share/zsh
  - $ chmod 755 /usr/local/share/zsh/site-functions
  - $ mkdir -p ~/.local/share/zsh
- - TODO: Confirm what is in /etc/zshenv on a fresh install and update this.
-   - $ echo 'export ZDOTDIR="${HOME}/.config/zsh"' >> /etc/zshenv
+ - Download the system zshenv file
+   - $ cd ~/Downloads && curl -L -O https://raw.githubusercontent.com/nerditup/scripts/master/macOS/etc/zshenv
+   - $ sudo cp zshenv /etc/zshenv
  - Symlink ZSH configuration
    - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/zsh/.config/zsh ~/.config/zsh
  - Close the Terminal and re-open.
@@ -242,8 +248,9 @@ Configure ZSH
 Cleanup
 -------
  - Terminal
-   - Import profile found in:
-     - ~/Source/GitHub/nerditup/dotfiles/macOS/terminal/Google.terminal
+   - Copy Terminal settings from Server
+     - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Google.terminal .
+   - Import profile into Terminal
  - vim
    - Create the cache and data directories
      - $ mkdir -p ~/.cache/vim
@@ -256,6 +263,7 @@ Cleanup
    - Symlink git configuration
      - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/git/.config/git ~/.config/git
    - Create ~/.config/git/config-personal with email and signing key configured.
+     - $ gpg --list-keys --with-subkey-fingerprint | grep '\[S\]' -A 1
  - gnupg
    - Symlink GnuPG configuration
      - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/gnupg/.local/share/gnupg/gpg.conf ~/.local/share/gnupg/gpg.conf
@@ -276,14 +284,22 @@ Install Additional Applications
      - Check "Hide menu bar icon"
      - Check "Check for updates automatically"
      - Set "Gaps between windows" to 10 px
- - Install tmux with Homebrew
-   - $ brew install tmux
-   - Symlink tmux configuration
-     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/tmux/.config/tmux ~/.config/tmux
+ - Install UTM with Homebrew
+   - $ brew install --cask utm
 
 Setup Development Environment
 -----------------------------
 ...
-brew install shellcheck
-brew install --cask utm
-brew install --cask microsoft-teams
+ - Install tmux with Homebrew
+   - $ brew install tmux
+   - Symlink tmux configuration
+     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/tmux/.config/tmux ~/.config/tmux
+ - Install shellcheck with Homebrew
+   - $ brew install shellcheck
+
+Install Work Apps
+-----------------
+ - $ brew install --cask slack
+ - $ brew install --cask microsoft-teams
+ - $ brew install --cask zoom
+ - $ brew install --cask signal
