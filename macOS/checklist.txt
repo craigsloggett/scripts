@@ -66,22 +66,6 @@ System Preferences
        - Mail
        - Contacts
        - Calendars
- - Software Update
-   - Check "Automatically keep my Mac up to date"
- - Passwords
-   - Deselect "Detect compromised passwords"
- - Bluetooth
-   - Select "Show Bluetooth in menu bar"
- - Sound
-   - Select "Show Sound in menu bar: Always" under Output
- - Displays
-   - Relocate the menu bar to the secondary monitor.
-   - Configure Night Shift for Custom Schedule (5:00PM - 9:00AM)
- - Keyboard
-   - Update Key Repeat to the fastest setting
-   - Update Delay Until Repeat to the second from the shortest setting
-   - Touch Bar shows "Expanded Control Strip"
-   - Press fn key to "Show Emoji & Symbols"
  - Dock & Menu Bar
    - Adjust size to be smaller (to taste)
    - Uncheck "Show recent applications in Dock"
@@ -92,9 +76,25 @@ System Preferences
      - Conversion
      - Definition
      - System Preferences
+ - Passwords
+   - Deselect "Detect compromised passwords"
  - Security & Privacy
    - Turn on Firewall
    - Turn on FileVault
+ - Software Update
+   - Check "Automatically keep my Mac up to date"
+ - Bluetooth
+   - Select "Show Bluetooth in menu bar"
+ - Sound
+   - Select "Show Sound in menu bar: Always" under Output
+ - Keyboard
+   - Update Key Repeat to the fastest setting
+   - Update Delay Until Repeat to the second from the shortest setting
+   - Touch Bar shows "Expanded Control Strip"
+   - Press fn key to "Show Emoji & Symbols"
+ - Displays
+   - Relocate the menu bar to the secondary monitor.
+   - Configure Night Shift for Custom Schedule (5:00PM - 9:00AM)
  - Mouse
    - Uncheck "Scroll direction: Natural"
  - Battery

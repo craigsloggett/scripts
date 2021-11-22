@@ -2,24 +2,38 @@
 #
 # setup.sh - macOS installation shell script.
 
-err() {
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
-}
+# Helpers
 
-if ! do_something; then
-  err "Unable to do_something"
-  exit 1
-fi
+apple_dock_app_entry() {
+  app_name="$1"
+  app_path=""
+
+  case "${app_name}" in
+         Mail) app_path="/System/Applications" ;;
+     Calendar) app_path="/System/Applications" ;;
+    Reminders) app_path="/System/Applications" ;;
+        Notes) app_path="/System/Applications" ;;
+     Terminal) app_path="/System/Applications/Utilities" ;;
+            *) app_path="/Applications" ;;
+  esac
+
+
+  printf '<dict>
+            <key>tile-data</key>
+              <dict>
+                <key>file-data</key>
+                  <dict>
+                    <key>_CFURLString</key><string>/%s/%s.app</string>
+                    <key>_CFURLStringType</key><integer>0</integer>
+                  </dict>
+              </dict>
+          </dict>' "${app_path}" "${app_name}"
+}
 
 # Prepare the OS
 
 capitalize_username() {
   :  # This can't be automated as far as I can tell.
-}
-
-cleanup_dock() {
-  :  # Configure which applications are in the Dock in a declarative way.
-  :  # Configure the size of the Dock in a declarative way.
 }
 
 add_source_directory() {
@@ -32,76 +46,6 @@ install_homebrew() {
   # Homebrew (taken from their website)
   # https://brew.sh/
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-}
-
-# Login to the appropriate accounts.
-
-login_apple_id() {
-  :  # This can't be automated as far as I can tell.
-}
-
-login_exchange() {
-  :  # This can't be automated as far as I can tell.
-}
-
-# The following functions encapsulate the System Preferences by the same name.
-
-configure_dock_and_menu_bar() {
-  :  #
-}
-
-configure_spotlight() {
-  :  #
-}
-
-configure_passwords() {
-  :  # Disable "Detect compromised passwords".
-}
-
-configure_security_and_privacy() {
-  :  #
-}
-
-configure_software_update() {
-  :  # Enable automatic updates.
-}
-
-configure_bluetooth() {
-  :  #
-}
-
-configure_sound() {
-  :  #
-}
-
-configure_keyboard() {
-  :  #
-}
-
-configure_displays() {
-  :  #
-}
-
-# Application Preferences
-
-configure_finder() {
-  :  #
-}
-
-configure_safari() {
-  :  #
-}
-
-configure_textedit() {
-  :  #
-}
-
-configure_mail() {
-  :  #
-}
-
-configure_calendar() {
-  :  #
 }
 
 # Command Line Utilities
@@ -123,6 +67,167 @@ setup_pass() {
   :  # Check if GnuPG and SSH are setup and configured.
   :  # Install pass with Homebrew.
   :  # Clone the Password Store Git repository.
+}
+
+# Login to the appropriate accounts.
+
+login_apple_id() {
+  :  # This can't be automated as far as I can tell.
+}
+
+login_exchange() {
+  :  # This can't be automated as far as I can tell.
+}
+
+# The following functions encapsulate the System Preferences by the same name.
+
+configure_dock_and_menu_bar() {
+  # Adjust the size of the Docker
+  defaults write com.apple.dock tilesize -float 48.0
+  # Uncheck "Show recent applications in Dock"
+  defaults write com.apple.dock show-recents -bool false
+
+  # Cleanup the Dock items
+  defaults delete com.apple.dock persistent-apps
+
+  # Remove the Downloads folder and recent apps from the Dock
+  defaults delete com.apple.dock persistent-others
+  defaults delete com.apple.dock recent-apps
+
+  # Configure which applications are in the Dock in a declarative way.
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Firefox")"
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Mail")"
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Calendar")"
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Reminders")"
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Notes")"
+  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Terminal")"
+}
+
+configure_spotlight() {
+  # Reboot required for all settings to take affect.
+
+  # To get the 'Source' option in Spotlight
+  touch /Applications/Xcode.app
+
+  # I'm pretty sure a reboot is required before writing the settings to disable 'Source'.
+
+  defaults write com.apple.spotlight orderedItems -array \
+    '{"enabled" = 1;"name" = "APPLICATIONS";}' \
+   	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+   	'{"enabled" = 1;"name" = "MENU_EXPRESSION";}' \
+   	'{"enabled" = 0;"name" = "CONTACT";}' \
+   	'{"enabled" = 1;"name" = "MENU_CONVERSION";}' \
+   	'{"enabled" = 1;"name" = "MENU_DEFINITION";}' \
+   	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
+   	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+   	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
+   	'{"enabled" = 1;"name" = "FONTS";}' \
+   	'{"enabled" = 0;"name" = "IMAGES";}' \
+   	'{"enabled" = 0;"name" = "MESSAGES";}' \
+   	'{"enabled" = 0;"name" = "MOVIES";}' \
+   	'{"enabled" = 0;"name" = "MUSIC";}' \
+   	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+   	'{"enabled" = 0;"name" = "PDF";}' \
+   	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+   	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}' \
+   	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+   	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+   	'{"enabled" = 0;"name" = "SOURCE";}' \
+   	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}'
+
+  # Once rebooted, rebuild the index from scratch.
+  # sudo mdutil -E
+}
+
+configure_passwords() {
+  :  # Disable "Detect compromised passwords".
+}
+
+configure_security_and_privacy() {
+  # TODO: Handle this to be idempotent
+
+  # Turn on Firewall
+  defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+  # Turn on FileVault
+  sudo fdesetup enable
+}
+
+configure_software_update() {
+  # Check 'Automatically keep my Mac up to date'
+  defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+  # Check everything under 'Advanced'
+  defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool true
+  defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+  defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+  defaults write /Library/Preferences/com.apple.commerce ConfigDataInstall -bool true
+  defaults write /Library/Preferences/com.apple.commerce CriticalUpdateInstall -bool true
+}
+
+configure_bluetooth() {
+  # Check "Show Bluetooth in menu bar"
+  defaults -currentHost write com.apple.controlcenter Sound -int 18
+}
+
+configure_sound() {
+  # Check "Show Sound in menu bar: Always"
+  defaults -currentHost write com.apple.controlcenter Sound -int 18
+}
+
+configure_keyboard() {
+  # Logout / Login required for all settings to take affect.
+
+  # Update Key Repeat to the fastest setting
+  defaults write -g KeyRepeat -int 2
+  # Update Delay Until Repeat to the second from the shortest setting
+  defaults write -g InitialKeyRepeat -int 25
+  # Touch Bar shows "Expanded Control Strip"
+  defaults write com.apple.touchbar.agent PresentationModeGlobal -string "fullControlStrip"
+  # Press fn key to "Show Emoji & Symbols"
+  defaults write com.apple.HIToolbox AppleFnUsageType -int 2
+}
+
+configure_displays() {
+  :  #
+}
+
+configure_mouse() {
+  :  #
+}
+
+configure_battery() {
+  # Check "Prevent your Mac from automatically sleeping when the display is off"
+  sudo pmset -c sleep 0
+}
+
+# Application Preferences
+
+configure_finder() {
+  # Update "New Finder windows show:" to Home
+  defaults write com.apple.finder NewWindowTarget -string "PfHm"
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+  # Show Status Bar
+  defaults write com.apple.finder ShowStatusBar -bool true
+  # Show Path Bar
+  defaults write com.apple.finder ShowPathbar -bool true
+  # Avoid creating .DS_Store files on network or USB volumes
+  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+  defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+}
+
+configure_safari() {
+  :  #
+}
+
+configure_textedit() {
+  :  #
+}
+
+configure_mail() {
+  :  #
+}
+
+configure_calendar() {
+  :  #
 }
 
 setup_firefox() {
@@ -184,49 +289,47 @@ setup_rectangle() {
   :  # Configure the application.
 }
 
-
 main() {
   # Globally enable exit-on-error and require variables to be set.
   set -o errexit
   set -o nounset
 
-  capitalize_username
-  cleanup_dock
-  add_source_directory
-  install_homebrew
-  login_apple_id
-  login_exchange
-
+#  capitalize_username
+#  add_source_directory
+#  install_homebrew
+#  login_apple_id
+#  login_exchange
+#
   configure_dock_and_menu_bar
-  configure_spotlight
-  configure_passwords
-  configure_security_and_privacy
-  configure_software_update
-  configure_bluetooth
-  configure_sound
-  configure_keyboard
-  configure_displays
-
-  configure_finder
-  configure_safari
-  configure_textedit
-  configure_mail
-  configure_calendar
-
-  configure_ssh
-  setup_gnupg
-  setup_pass
-  setup_firefox
-  clone_dotfiles_repository
-  configure_zsh
-
-  import_terminal_profile
-  configure_vim
-  configure_git
-  configure_gnupg
-  configure_less
-
-  setup_rectangle
+#  configure_spotlight
+#  configure_passwords
+#  configure_security_and_privacy
+#  configure_software_update
+#  configure_bluetooth
+#  configure_sound
+#  configure_keyboard
+#  configure_displays
+#
+#  configure_finder
+#  configure_safari
+#  configure_textedit
+#  configure_mail
+#  configure_calendar
+#
+#  configure_ssh
+#  setup_gnupg
+#  setup_pass
+#  setup_firefox
+#  clone_dotfiles_repository
+#  configure_zsh
+#
+#  import_terminal_profile
+#  configure_vim
+#  configure_git
+#  configure_gnupg
+#  configure_less
+#
+#  setup_rectangle
 }
 
 main "$@"
