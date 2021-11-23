@@ -4,7 +4,7 @@
 
 # Helper Functions
 
-apple_dock_app_entry() {
+generate_dock_app_entry() {
   # Return the configuration required to add an app to the Dock.
   app_name="$1"
   app_path=""
@@ -98,12 +98,12 @@ configure_dock_and_menu_bar() {
   defaults delete com.apple.dock recent-apps
 
   # Configure which applications are in the Dock in a declarative way.
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Firefox")"
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Mail")"
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Calendar")"
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Reminders")"
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Notes")"
-  defaults write com.apple.dock persistent-apps -array-add "$(apple_dock_app_entry "Terminal")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Firefox")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Mail")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Calendar")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Reminders")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Notes")"
+  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Terminal")"
 }
 
 configure_spotlight() {
