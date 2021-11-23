@@ -51,10 +51,7 @@ capitalize_username() {
 }
 
 add_source_directory() {
-  :  # Check if the directory exists.
-  [ -d "${HOME}/Source" ]
-  :  # Create it.
-  :  # Use a custom icon.
+  mkdir -p "${HOME}/Source"
 }
 
 install_homebrew() {
@@ -66,22 +63,59 @@ install_homebrew() {
 # Command Line Utilities
 
 configure_ssh() {
-  :  # Generate an SSH keypair.
-  :  # Copy the public SSH key to my server.
+  ssh_key_filename="${SSH_KEY_FILENAME:-id_ed25519}"
+
+  if [ ! -f "${HOME}/.ssh/${ssh_key_filename}" ]; then
+    ssh-keygen -f "${HOME}/.ssh/${ssh_key_filename}" -t ed25519 -q -N ""
+  fi
+
+  # Copy the public SSH key to my server.
+  # TODO: Automate this process.
+  printf '%s\n' "Distribute the public key now. I'll wait."
+  read -r
 }
 
 setup_gnupg() {
-  :  # Check if SSH is configured.
-  :  # Install gnupg with Homebrew.
-  :  # Copy the GPG keys from my server.
-  :  # Import the GPG keys.
-  :  # Set the trust level on the GPG keys.
+  export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
+  gpg_key_filename="${GPG_KEY_FILENAME:-gpg-user.key}"
+
+  # Install gnupg with Homebrew.
+  if [ ! -f /usr/local/bin/gpg ]; then
+    brew install gnupg
+  fi
+
+  # Copy the GPG keys from my server.
+  # TODO: Automate this process.
+  while [ ! -f "${HOME}/Downloads/${gpg_key_filename}" ]; do
+    printf '%s\n' "Download the relevant GPG keys and put them in: \
+                   ${HOME}/Downloads/${gpg_key_filename}"
+    read -r 
+  done
+
+  # Setup the GPG directory.
+  mkdir -p "$GNUPGHOME"
+  chmod 700 "$GNUPGHOME"
+
+  # Import the GPG keys.
+  gpg --import "${HOME}/Downloads/${gpg_key_filename}"
+
+  # Set the trust level on the GPG keys.
+  printf '%s\n' "Set the trust level of the imported keys: gpg --edit-key <KEY>"
+  read -r
 }
 
 setup_pass() {
-  :  # Check if GnuPG and SSH are setup and configured.
-  :  # Install pass with Homebrew.
-  :  # Clone the Password Store Git repository.
+  export PASSWORD_STORE_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pass"
+
+  if [ ! -f /usr/local/bin/pass ]; then
+    brew install pass
+  fi
+
+  if [ ! -d "${PASSWORD_STORE_DIR}" ]; then
+    printf '%s\n' "Clone the password store repository to: \
+                   ${PASSWORD_STORE_DIR}"
+    read -r
+  fi
 }
 
 # Login to the appropriate accounts.
@@ -315,7 +349,7 @@ main() {
 #  login_apple_id
 #  login_exchange
 #
-  configure_dock_and_menu_bar
+#  configure_dock_and_menu_bar
 #  configure_spotlight
 #  configure_passwords
 #  configure_security_and_privacy
