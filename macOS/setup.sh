@@ -12,14 +12,25 @@ generate_dock_app_entry() {
   # Most apps are in /Applications with the exception of what is
   # listed here.
   case "${app_name}" in
-         Mail) app_path="/System/Applications" ;;
-     Calendar) app_path="/System/Applications" ;;
-    Reminders) app_path="/System/Applications" ;;
-        Notes) app_path="/System/Applications" ;;
-     Terminal) app_path="/System/Applications/Utilities" ;;
-            *) app_path="/Applications" ;;
+    Mail)
+      app_path="/System/Applications"
+      ;;
+    Calendar)
+      app_path="/System/Applications"
+      ;;
+    Reminders)
+      app_path="/System/Applications"
+      ;;
+    Notes)
+      app_path="/System/Applications"
+      ;;
+    Terminal)
+      app_path="/System/Applications/Utilities"
+      ;;
+    *)
+      app_path="/Applications"
+      ;;
   esac
-
 
   printf '<dict>
             <key>tile-data</key>
@@ -41,6 +52,7 @@ capitalize_username() {
 
 add_source_directory() {
   :  # Check if the directory exists.
+  [ -d "${HOME}/Source" ]
   :  # Create it.
   :  # Use a custom icon.
 }
