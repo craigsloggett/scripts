@@ -2,12 +2,15 @@
 #
 # setup.sh - macOS installation shell script.
 
-# Helpers
+# Helper Functions
 
 apple_dock_app_entry() {
+  # Return the configuration required to add an app to the Dock.
   app_name="$1"
   app_path=""
 
+  # Most apps are in /Applications with the exception of what is
+  # listed here.
   case "${app_name}" in
          Mail) app_path="/System/Applications" ;;
      Calendar) app_path="/System/Applications" ;;
