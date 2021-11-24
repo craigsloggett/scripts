@@ -188,13 +188,7 @@ configure_spotlight() {
   # sudo mdutil -E
 }
 
-configure_passwords() {
-  :  # Disable "Detect compromised passwords".
-}
-
 configure_security_and_privacy() {
-  # TODO: Handle this to be idempotent
-
   # Turn on Firewall
   defaults write /Library/Preferences/com.apple.alf globalstate -int 1
   # Turn on FileVault
@@ -264,7 +258,62 @@ configure_finder() {
 }
 
 configure_safari() {
-  :  #
+  # In order for defaults to behave correctly for Safari, you need to grant
+  # Terminal Full Disk Access.
+
+  # Add Terminal to "Full Disk Access" under Security & Privacy -> Privacy
+  # https://github.com/mathiasbynens/dotfiles/issues/849#issuecomment-436697238
+  printf '%s\n' "Add Terminal to \"Full Disk Access\" under Security & Privacy -> Privacy"
+  osascript -e 'tell application "System Preferences" to reveal anchor "Privacy" of pane "com.apple.preference.security" activate'
+  read -r
+
+  # Start Page Settings
+  # Uncheck all options except for "Privacy Report"
+  defaults write com.apple.Safari ShowFavorites -bool false
+  defaults write com.apple.Safari ShowFrequentlyVisitedSites -bool false
+  defaults write com.apple.Safari ShowSiriSuggestionsPreference -bool false
+  defaults write com.apple.Safari ShowReadingListInFavorites -bool false
+  defaults write com.apple.Safari ShowBackgroundImageInFavorites -bool false
+
+  # General
+  # Remove history items: After one day
+  defaults write com.apple.Safari HistoryAgeInDaysLimit -int 1
+  # Remove download list items: When Safari quits
+  defaults write com.apple.Safari DownloadsClearingPolicy -int 1
+  # Uncheck "Open "safe" files after downloading".
+  defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+
+  # AutoFill
+  # Uncheck all AutoFill web forms options.
+  defaults write com.apple.Safari AutoFillFromAddressBook -bool false
+  defaults write com.apple.Safari AutoFillPasswords -bool false
+  defaults write com.apple.Safari AutoFillCreditCardData -bool false
+  defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
+
+  # Passwords
+  # Uncheck "Detect compromised passwords"
+  defaults write com.apple.Safari PasswordBreachDetectionOn -bool false
+  # Search
+  # Select DuckDuckGo as the Search engine
+  defaults write com.apple.Safari SearchProviderShortName -string "DuckDuckGo"
+  # Uncheck "Include search engine suggestions"
+  defaults write com.apple.Safari SuppressSearchSuggestions -bool true
+  # Uncheck all options in Smart Search Field except for "Show Favorites"
+  defaults write com.apple.Safari WebsiteSpecificSearchEnabled -bool false
+  defaults write com.apple.Safari PreloadTopHit -bool false
+  # Security
+  # Uncheck "Warn when visiting a fraudulent website"
+  defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool false
+  # Privacy
+  # Check "Block all cookies"
+  defaults write com.apple.Safari BlockStoragePolicy -int 2
+  # Uncheck "Allow websites to check for Apple Pay and Apple Card
+  defaults write com.apple.Safari WebKitPreferences.applePayCapabilityDisclosureAllowed -bool false
+  # Uncheck "Allow privacy-preserving measurements of ad effectiveness"
+  defaults write com.apple.Safari WebKitPreferences.privateClickMeasurementEnabled -bool false
+  # Advanced
+  # Check "Show full website address"
+  defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
 }
 
 configure_textedit() {
@@ -360,7 +409,7 @@ main() {
 #  configure_displays
 #
 #  configure_finder
-#  configure_safari
+  configure_safari
 #  configure_textedit
 #  configure_mail
 #  configure_calendar
