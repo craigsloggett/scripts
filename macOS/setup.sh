@@ -502,33 +502,33 @@ import_terminal_profile() {
 
 configure_vim() {
   # Create the cache and data directories.
-	mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}/vim"
-	mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/vim"
+  mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}/vim"
+  mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/vim"
 
   :  # Symlink Vim configuration.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
 
   # Cleanup Vim files left over from fresh install.
-	rm -f "${HOME}/.viminfo"
+  rm -f "${HOME}/.viminfo"
 }
 
 configure_git() {
   :  # Symlink Git configuration.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
   :  # Create a config-personal file with email and signing key configured.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
 }
 
 configure_gnupg() {
   :  # Symlink GnuPG configuration.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
 }
 
 configure_less() {
   # Create the Less history directory.
-	mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/less"
+  mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/less"
   # Cleanup Less files left over from fresh install.
-	rm -f "${HOME}/.lesshst"
+  rm -f "${HOME}/.lesshst"
 }
 
 # Additional Applications
@@ -537,9 +537,9 @@ setup_rectangle() {
   # Install Rectangle with Homebrew (Cask)
   if [ ! -d /Applications/Rectangle.app ]; then
     brew install --cask rectangle
-	fi
+  fi
   :  # Configure the application.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
 }
 
 main() {
