@@ -67,8 +67,8 @@ setup_xdg_directories() {
 }
 
 add_source_directory() {
-	source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
-  mkdir -p "${source_directory}"
+  source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
+    mkdir -p "${source_directory}"
 }
 
 install_homebrew() {
@@ -397,8 +397,8 @@ setup_firefox() {
     sleep 5
   fi  
 
-	# Copy the user.js to the Firefox directory....
-	# TODO: do this automatically.
+  # Copy the user.js to the Firefox directory....
+  # TODO: do this automatically.
 
   # The rest can't be automated as far as I can tell.
   :  # Login to Sync
@@ -438,31 +438,31 @@ clone_dotfiles_repository() {
   printf '%s\n' "Login to GitHub and add the public SSH key to your account."
   read -r
 
-	case "${dotfiles_repository}" in
-		*github*)
-			username="${dotfiles_repository##*github.com}"
-			username="${username:1}"
-			username="${username%%/*}"
-
-			reponame="${dotfiles_repository##*/}"
-			reponame="${reponame%%.git}"
-
-			if [ ! -d "${source_directory}/GitHub/${username}/${reponame}" ]; then
-				mkdir -p "${source_directory}/GitHub/${username}"
-				git clone "${dotfiles_repository}" "${source_directory}/GitHub/${username}/${reponame}"
-			fi
-			;;
-		*)
-  		# Manually clone the dotfiles repository to the ~/Source directory.
-  		printf '%s\n' "Clone your dotfiles to the desired location."
-  		read -r
-			;;
-	esac
+  case "${dotfiles_repository}" in
+    *github*)
+      username="${dotfiles_repository##*github.com}"
+      username="${username:1}"
+      username="${username%%/*}"
+      
+      reponame="${dotfiles_repository##*/}"
+      reponame="${reponame%%.git}"
+      
+      if [ ! -d "${source_directory}/GitHub/${username}/${reponame}" ]; then
+        mkdir -p "${source_directory}/GitHub/${username}"
+        git clone "${dotfiles_repository}" "${source_directory}/GitHub/${username}/${reponame}"
+      fi
+      ;;
+    *)
+      # Manually clone the dotfiles repository to the ~/Source directory.
+      printf '%s\n' "Clone your dotfiles to the desired location."
+      read -r
+      ;;
+  esac
 }
 
 configure_zsh() {
   # Create /etc/zshenv to export ZDOTDIR
-	cat << 'EOF' | sudo tee /etc/zshenv
+  cat << 'EOF' | sudo tee /etc/zshenv
 # /etc/zshenv: system-wide .zshenv file for zsh(1).
 #
 # This file is sourced on all invocations of the shell.
@@ -487,11 +487,11 @@ EOF
   mkdir -p "${XDG_DATA_HOME}/zsh"
 
   :  # Symlink ZSH configuration.
-	# TODO: Automate this process.
+  # TODO: Automate this process.
 
   # Cleanup ZSH files left over from fresh install.
-	rm -f "${HOME}/.zsh_history"
-	rm -rf "${HOME}/.zsh_sessions"
+  rm -f "${HOME}/.zsh_history"
+  rm -rf "${HOME}/.zsh_sessions"
 }
 
 # Cleanup Items
