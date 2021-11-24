@@ -50,14 +50,34 @@ capitalize_username() {
   :  # This can't be automated as far as I can tell.
 }
 
+setup_xdg_directories() {
+  # Export the XDG environment variables if they aren't already.
+  export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
+  export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+  export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+  export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
+  export XDG_LIB_HOME="${XDG_LIB_HOME:-${HOME}/.local/lib}"
+
+  # Create all directories.
+  mkdir -p "$XDG_CONFIG_HOME"
+  mkdir -p "$XDG_CACHE_HOME"
+  mkdir -p "$XDG_DATA_HOME"
+  mkdir -p "$XDG_BIN_HOME"
+  mkdir -p "$XDG_LIB_HOME"
+}
+
 add_source_directory() {
-  mkdir -p "${HOME}/Source"
+	source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
+  mkdir -p "${source_directory}"
 }
 
 install_homebrew() {
   # Homebrew (taken from their website)
   # https://brew.sh/
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  if ! command -v brew > /dev/null; then
+    /bin/bash -c "$(curl -fsSL ${brew_url})"
+  fi
 }
 
 # Command Line Utilities
@@ -71,43 +91,54 @@ configure_ssh() {
 
   # Copy the public SSH key to my server.
   # TODO: Automate this process.
-  printf '%s\n' "Distribute the public key now. I'll wait."
+  printf '%s\n' "Distribute the public key now."
   read -r
 }
 
 setup_gnupg() {
-  export GNUPGHOME="${XDG_DATA_HOME:=$HOME/.local/share}/gnupg"
-  gpg_key_filename="${GPG_KEY_FILENAME:-gpg-user.key}"
+  export GNUPGHOME="${XDG_DATA_HOME:-${HOME}/.local/share}/gnupg"
+
+  # Configuration Options
+  gpg_public_key="${GPG_PUBLIC_KEY:-23BF43EF}"
+  gpg_key_filename="${GPG_KEY_FILENAME:-secret-subkeys.gpg}"
 
   # Install gnupg with Homebrew.
-  if [ ! -f /usr/local/bin/gpg ]; then
+  if ! command -v gpg > /dev/null; then
     brew install gnupg
   fi
-
-  # Copy the GPG keys from my server.
-  # TODO: Automate this process.
-  while [ ! -f "${HOME}/Downloads/${gpg_key_filename}" ]; do
-    printf '%s\n' "Download the relevant GPG keys and put them in: \
-                   ${HOME}/Downloads/${gpg_key_filename}"
-    read -r 
-  done
 
   # Setup the GPG directory.
   mkdir -p "$GNUPGHOME"
   chmod 700 "$GNUPGHOME"
 
-  # Import the GPG keys.
-  gpg --import "${HOME}/Downloads/${gpg_key_filename}"
+  # Copy the GPG keys from my server.
+  # TODO: Automate this process.
+  printf '%s %s\n' "Download the relevant GPG keys and put them in:" \
+                   "${HOME}/Downloads/${gpg_key_filename}"
+  read -r 
 
-  # Set the trust level on the GPG keys.
-  printf '%s\n' "Set the trust level of the imported keys: gpg --edit-key <KEY>"
-  read -r
+  # Import the GPG keys if not imported already.
+  if ! gpg -k | grep -q "${gpg_public_key}"; then
+    gpg --import "${HOME}/Downloads/${gpg_key_filename}"
+  fi
+
+  # Set the trust level on the GPG keys if not set.
+  if gpg -k | grep 'uid' | grep -q 'unknown'; then
+    printf '%s %s\n' "Set the trust level of the imported keys:" \
+                     "gpg --edit-key ${gpg_public_key}"
+    read -r
+  fi
 }
 
 setup_pass() {
-  export PASSWORD_STORE_DIR="${XDG_DATA_HOME:=$HOME/.local/share}/pass"
+  export PASSWORD_STORE_DIR="${XDG_DATA_HOME:=${HOME}/.local/share}/pass"
 
-  if [ ! -f /usr/local/bin/pass ]; then
+  if ! command -v gpg > /dev/null; then
+    :  # GnuPG being configured is a requirement.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi
+
+  if ! command -v pass > /dev/null; then
     brew install pass
   fi
 
@@ -190,25 +221,28 @@ configure_spotlight() {
 
 configure_security_and_privacy() {
   # Turn on Firewall
-  defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+  sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
   # Turn on FileVault
-  sudo fdesetup enable
+  if sudo fdesetup status | grep -q 'FileVault is Off.'; then
+    printf '%s\n' "Enabling FileVault, please follow the prompts:"
+    sudo fdesetup enable
+  fi
 }
 
 configure_software_update() {
   # Check 'Automatically keep my Mac up to date'
-  defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
   # Check everything under 'Advanced'
-  defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool true
-  defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
-  defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
-  defaults write /Library/Preferences/com.apple.commerce ConfigDataInstall -bool true
-  defaults write /Library/Preferences/com.apple.commerce CriticalUpdateInstall -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+  sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+  sudo defaults write /Library/Preferences/com.apple.commerce ConfigDataInstall -bool true
+  sudo defaults write /Library/Preferences/com.apple.commerce CriticalUpdateInstall -bool true
 }
 
 configure_bluetooth() {
   # Check "Show Bluetooth in menu bar"
-  defaults -currentHost write com.apple.controlcenter Sound -int 18
+  defaults -currentHost write com.apple.controlcenter Bluetooth -int 18
 }
 
 configure_sound() {
@@ -317,7 +351,21 @@ configure_safari() {
 }
 
 configure_textedit() {
-  :  #
+  # Select "Plain Text"
+  defaults write com.apple.TextEdit RichText -bool false
+  # Uncheck all "Options"
+  defaults write com.apple.TextEdit CheckSpellingWhileTyping -bool false
+  defaults write com.apple.TextEdit CorrectSpellingAutomatically -bool false
+  defaults write com.apple.TextEdit ShowRuler -bool false
+  defaults write com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly -bool false
+  defaults write com.apple.TextEdit SmartCopyPaste -bool false
+  defaults write com.apple.TextEdit SmartQuotes -bool false
+  defaults write com.apple.TextEdit SmartDashes -bool false
+  defaults write com.apple.TextEdit TextReplacement -bool false
+  # Uncheck "Add ".txt" extension to plain text files"
+  defaults write com.apple.TextEdit AddExtensionToNewPlainTextFiles -bool false
+  # Check "Display HTML files as HTML code instead of formatted text"
+  defaults write com.apple.TextEdit IgnoreHTML -bool true
 }
 
 configure_mail() {
@@ -329,29 +377,121 @@ configure_calendar() {
 }
 
 setup_firefox() {
-  :  # Check if Pass is setup.
-  :  # Install Firefox with Homebrew.
-  :  # Open Firefox to create a profile directory then close it.
-  :  # Download a user.js file from the dotfiles repository.
-  :  # Copy the user.js file to the Firefox profile directory.
+  if ! command -v pass > /dev/null; then
+    :  # Passwords are needed to setup Firefox.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi
+
+  # Install Firefox with Homebrew.
+  if [ ! -d /Applications/Firefox.app ]; then
+    brew install --cask firefox
+  fi  
+
+  # Firefox must be run once before the default-release folder is generated.
+  if [ ! -d "${HOME}/Library/Application Support/Firefox/Profiles/" ]; then
+  	printf '%s\n' "Opening Firefox to generate the default-release folder."
+    /Applications/Firefox.app/Contents/MacOS/./firefox &
+		printf '%s\n'	"Waiting 10 seconds before closing automatically..."
+    sleep 10
+    kill -9 "$(pgrep firefox)"
+    sleep 5
+  fi  
+
+	# Copy the user.js to the Firefox directory....
+	# TODO: do this automatically.
+
   # The rest can't be automated as far as I can tell.
   :  # Login to Sync
   :  # Turn syncing on only for Bookmarks.
 }
 
 clone_dotfiles_repository() {
-  :  # Check if Firefox is setup.
-  # This can't be automated as far as I can tell.
-  :  # Login to GitHub and add the public SSH key to my account.
-  # The rest is automated.
-  :  # Clone the dotfiles repository to the ~/Source directory via SSH.
+  ssh_key_filename="${SSH_KEY_FILENAME:-id_ed25519}"
+	source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
+	dotfiles_repository="${DOTFILES_REPOSITORY:-github.com:nerditup/dotfiles.git}"
+
+  if ! command -v git > /dev/null; then
+    :  # Git is required to clone the dotfiles.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi
+
+  if ! command -v pass > /dev/null; then
+    :  # Passwords are required to login to GitHub.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi
+
+  if [ ! -f "${HOME}/.ssh/${ssh_key_filename}" ]; then
+		:  # An SSH key is required to clone the dotfiles.
+    :  # TODO: Decide what to do if this requirement is not met.
+	fi
+
+  if [ ! -d /Applications/Firefox.app ]; then
+    :  # Firefox is needed to add an SSH key to GitHub.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi  
+
+	pbcopy < "${HOME}/.ssh/${ssh_key_filename}.pub"
+	printf '%s\n' "Public SSH key copied to the clipboard."
+
+  # Login to GitHub and add the public SSH key to my account.
+  # TODO: Automate this process.
+  printf '%s\n' "Login to GitHub and add the public SSH key to your account."
+  read -r
+
+	case "${dotfiles_repository}" in
+		*github*)
+			username="${dotfiles_repository##*github.com}"
+			username="${username:1}"
+			username="${username%%/*}"
+
+			reponame="${dotfiles_repository##*/}"
+			reponame="${reponame%%.git}"
+
+			if [ ! -d "${source_directory}/GitHub/${username}/${reponame}" ]; then
+				mkdir -p "${source_directory}/GitHub/${username}"
+				git clone "${dotfiles_repository}" "${source_directory}/GitHub/${username}/${reponame}"
+			fi
+			;;
+		*)
+  		# Manually clone the dotfiles repository to the ~/Source directory.
+  		printf '%s\n' "Clone your dotfiles to the desired location."
+  		read -r
+			;;
+	esac
 }
 
 configure_zsh() {
-  :  # Create the XDG directories.
-  :  # Create /etc/zshenv to export ZDOTDIR
+  # Create /etc/zshenv to export ZDOTDIR
+	cat << 'EOF' | sudo tee /etc/zshenv
+# /etc/zshenv: system-wide .zshenv file for zsh(1).
+#
+# This file is sourced on all invocations of the shell.
+# If the -f flag is present or if the NO_RCS option is
+# set within this file, all other initialization files
+# are skipped.
+#
+# This file should contain commands to set the command
+# search path, plus other important environment variables.
+# This file should not contain commands that produce
+# output or assume the shell is attached to a tty.
+#
+# Global Order: zshenv, zprofile, zshrc, zlogin
+
+# ZSH Dot Directory
+export ZDOTDIR="${HOME}/.config/zsh"
+EOF
+
+  chmod 755 /usr/local/share/zsh
+  chmod 755 /usr/local/share/zsh/site-functions
+
+  mkdir -p "${XDG_DATA_HOME}/zsh"
+
   :  # Symlink ZSH configuration.
-  :  # Cleanup ZSH files left over from fresh install.
+	# TODO: Automate this process.
+
+  # Cleanup ZSH files left over from fresh install.
+	rm -f "${HOME}/.zsh_history"
+	rm -rf "${HOME}/.zsh_sessions"
 }
 
 # Cleanup Items
@@ -361,73 +501,109 @@ import_terminal_profile() {
 }
 
 configure_vim() {
-  :  # Create the cache and data directories.
+  # Create the cache and data directories.
+	mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}/vim"
+	mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/vim"
+
   :  # Symlink Vim configuration.
-  :  # Cleanup Vim files left over from fresh install.
+	# TODO: Automate this process.
+
+  # Cleanup Vim files left over from fresh install.
+	rm -f "${HOME}/.viminfo"
 }
 
 configure_git() {
   :  # Symlink Git configuration.
+	# TODO: Automate this process.
   :  # Create a config-personal file with email and signing key configured.
+	# TODO: Automate this process.
 }
 
 configure_gnupg() {
   :  # Symlink GnuPG configuration.
+	# TODO: Automate this process.
 }
 
 configure_less() {
-  :  # Create the Less history directory.
-  :  # Cleanup Less files left over from fresh install.
+  # Create the Less history directory.
+	mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/less"
+  # Cleanup Less files left over from fresh install.
+	rm -f "${HOME}/.lesshst"
 }
 
 # Additional Applications
 
 setup_rectangle() {
-  :  # Install Rectangle with Homebrew (Cask)
+  # Install Rectangle with Homebrew (Cask)
+  if [ ! -d /Applications/Rectangle.app ]; then
+    brew install --cask rectangle
+	fi
   :  # Configure the application.
+	# TODO: Automate this process.
 }
 
 main() {
+  # Turn on Debugging Output
+  export PS4=" -> + "
+  set -x
+
   # Globally enable exit-on-error and require variables to be set.
   set -o errexit
   set -o nounset
 
+  # Ask for the administrator password upfront.
+  sudo -v
+
+  # Keep-alive: update existing `sudo` time stamp until script has finished.
+  while true; do 
+    sudo -n true; sleep 60; kill -0 "$$" || exit; 
+  done 2>/dev/null &
+
 #  capitalize_username
-#  add_source_directory
-#  install_homebrew
+  setup_xdg_directories
+  add_source_directory
+  install_homebrew
+  configure_ssh
+  setup_gnupg
+  setup_pass
+
 #  login_apple_id
 #  login_exchange
-#
-#  configure_dock_and_menu_bar
-#  configure_spotlight
-#  configure_passwords
-#  configure_security_and_privacy
-#  configure_software_update
-#  configure_bluetooth
-#  configure_sound
-#  configure_keyboard
+
+# Security and Privacy settings require sudo.
+  configure_security_and_privacy
+# Security and Privacy settings require sudo.
+  configure_software_update
+  configure_bluetooth
+  configure_sound
+# Keyboard requires Logout/Login for all settings to take affect.
+  configure_keyboard
 #  configure_displays
-#
-#  configure_finder
+#  configure_mouse
+  configure_battery
+
+  configure_finder
   configure_safari
-#  configure_textedit
+  configure_textedit
 #  configure_mail
 #  configure_calendar
-#
-#  configure_ssh
-#  setup_gnupg
-#  setup_pass
-#  setup_firefox
-#  clone_dotfiles_repository
-#  configure_zsh
-#
+
+  setup_firefox
+  clone_dotfiles_repository
+  configure_zsh
+
 #  import_terminal_profile
-#  configure_vim
-#  configure_git
-#  configure_gnupg
-#  configure_less
-#
-#  setup_rectangle
+  configure_vim
+  configure_git
+  configure_gnupg
+  configure_less
+
+  setup_rectangle
+
+# Dock requires applications to be installed first.
+#  configure_dock_and_menu_bar
+# Spotlight requires a reboot.
+#  configure_spotlight
 }
 
 main "$@"
