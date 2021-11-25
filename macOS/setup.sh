@@ -47,7 +47,34 @@ generate_dock_app_entry() {
 # Prepare the OS
 
 capitalize_username() {
-  :  # This can't be automated as far as I can tell.
+  # Remove everything before the final forward-slash '/'.
+  basename="${HOME##*/}"
+
+  case "${basename}" in
+    [!A-Z]*)
+      printf '%s%s\n' "Your account name and home directory do not start " \
+                      "with a capital: ${HOME}"
+
+      osascript -e 'tell application "System Preferences" to activate'
+
+      printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
+                  'To update your account name and home directory:' \
+                  ' 1. Create a new temporary "Administrator" account.' \
+                  ' 2. Logout then login with the new temporary account.' \
+                  ' 3. Open up "Users & Groups" in System Preferences.' \
+                  ' 4. Right click your user, then click "Advanced Settings".' \
+                  ' 5. Update "Account name" to have a capital letter.' \
+                  ' 6. Update "Home directory" to have a capital letter.' \
+                  ' 7. Rename the Home Directory to match the capital letter.' \
+                  ' 8. Logout then login with your account.' \
+                  ' 9. Delete the temporary account.'
+      exit 1
+    ;;
+
+    *)
+      :  # The username is capitalized, do nothing.
+    ;;
+  esac
 }
 
 setup_xdg_directories() {
@@ -153,10 +180,16 @@ setup_pass() {
 
 login_apple_id() {
   :  # This can't be automated as far as I can tell.
+  printf '%s\n' "Login to your Apple account."
+  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.AppleIDPrefPane" activate'
+  read -r
 }
 
 login_exchange() {
   :  # This can't be automated as far as I can tell.
+  printf '%s\n' "Login to your Exchange account."
+  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.internetaccounts" activate'
+  read -r
 }
 
 # The following functions encapsulate the System Preferences by the same name.
@@ -186,37 +219,90 @@ configure_dock_and_menu_bar() {
 configure_spotlight() {
   # Reboot required for all settings to take affect.
 
-  # To get the 'Source' option in Spotlight
-  touch /Applications/Xcode.app
+  if ! defaults read com.apple.spotlight orderedItems | grep -q "SOURCE"; then
+    # To get the 'Developer' option in Spotlight
+    touch /Applications/Xcode.app
+    # Open up the System Preferences application to make the option available in defaults.
+    osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preference.spotlight" activate'
+  fi
 
-  # I'm pretty sure a reboot is required before writing the settings to disable 'Source'.
+  if ! defaults read com.apple.spotlight orderedItems | grep -B 1 "SOURCE" | grep -q "enabled = 0;"; then
 
-  defaults write com.apple.spotlight orderedItems -array \
-    '{"enabled" = 1;"name" = "APPLICATIONS";}' \
-   	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
-   	'{"enabled" = 1;"name" = "MENU_EXPRESSION";}' \
-   	'{"enabled" = 0;"name" = "CONTACT";}' \
-   	'{"enabled" = 1;"name" = "MENU_CONVERSION";}' \
-   	'{"enabled" = 1;"name" = "MENU_DEFINITION";}' \
-   	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
-   	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
-   	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
-   	'{"enabled" = 1;"name" = "FONTS";}' \
-   	'{"enabled" = 0;"name" = "IMAGES";}' \
-   	'{"enabled" = 0;"name" = "MESSAGES";}' \
-   	'{"enabled" = 0;"name" = "MOVIES";}' \
-   	'{"enabled" = 0;"name" = "MUSIC";}' \
-   	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
-   	'{"enabled" = 0;"name" = "PDF";}' \
-   	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
-   	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}' \
-   	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
-   	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
-   	'{"enabled" = 0;"name" = "SOURCE";}' \
-   	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}'
+    printf '%s\n' "Configuring Spotlight..."
+    
+    defaults write com.apple.spotlight orderedItems -array \
+      '{"enabled" = 1;"name" = "APPLICATIONS";}' \
+     	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+     	'{"enabled" = 1;"name" = "MENU_EXPRESSION";}' \
+     	'{"enabled" = 0;"name" = "CONTACT";}' \
+     	'{"enabled" = 1;"name" = "MENU_CONVERSION";}' \
+     	'{"enabled" = 1;"name" = "MENU_DEFINITION";}' \
+     	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
+     	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+     	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
+     	'{"enabled" = 1;"name" = "FONTS";}' \
+     	'{"enabled" = 0;"name" = "IMAGES";}' \
+     	'{"enabled" = 0;"name" = "MESSAGES";}' \
+     	'{"enabled" = 0;"name" = "MOVIES";}' \
+     	'{"enabled" = 0;"name" = "MUSIC";}' \
+     	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+     	'{"enabled" = 0;"name" = "PDF";}' \
+     	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+     	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}' \
+     	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+     	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+     	'{"enabled" = 0;"name" = "SOURCE";}' \
+     	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}'
 
-  # Once rebooted, rebuild the index from scratch.
-  # sudo mdutil -E
+    # Create a temporary script to rebuild the index from scratch.
+    cat << 'EOF' > "${HOME}/Downloads/rebuild_spotlight_index.sh"
+#!/bin/sh
+#
+# rebuild_spotlight_index.sh - Rebuild the Spotlight index from scratch.
+
+# Turn on Debugging Output
+export PS4=" -> + "
+set -x
+
+# Globally enable exit-on-error and require variables to be set.
+set -o errexit
+set -o nounset
+
+printf '%s\n' "Asking for sudo password to rebuild the Spotlight index:"
+
+sudo mdutil -E
+
+# Cleanup
+rm -f "${HOME}/Downloads/rebuild_spotlight_index.sh"
+rm -f "${HOME}/Library/LaunchAgents/com.apple.rebuildspotlightindex.plist"
+EOF
+
+    # Update the permissions of the script.
+    chmod +x "${HOME}/Downloads/rebuild_spotlight_index.sh"
+
+    # Create a launchd Agent to run a script after rebooting.
+    mkdir -p "${HOME}/Library/LaunchAgents"  # launchd will be used to do things after rebooting.
+
+    cat << EOF > "${HOME}/Library/LaunchAgents/com.apple.rebuildspotlightindex.plist"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.apple.rebuildspotlightindex</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>open</string>
+      <string>-a</string>
+      <string>Terminal</string>
+      <string>${HOME}/Downloads/rebuild_spotlight_index.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+  </dict>
+</plist>
+EOF
+  fi
 }
 
 configure_security_and_privacy() {
@@ -240,14 +326,19 @@ configure_software_update() {
   sudo defaults write /Library/Preferences/com.apple.commerce CriticalUpdateInstall -bool true
 }
 
-configure_bluetooth() {
+configure_control_center() {
   # Check "Show Bluetooth in menu bar"
   defaults -currentHost write com.apple.controlcenter Bluetooth -int 18
-}
-
-configure_sound() {
   # Check "Show Sound in menu bar: Always"
   defaults -currentHost write com.apple.controlcenter Sound -int 18
+  # Check "Show Wi-Fi status in menu bar"
+  defaults -currentHost write com.apple.controlcenter WiFi -int 18
+  # Check "Show battery status in menu bar"
+  defaults -currentHost write com.apple.controlcenter Battery -int 18
+  # Uncheck "Show in Menu Bar"
+  defaults -currentHost write com.apple.spotlight MenuItemHidden -bool true
+  # Uncheck "Show fast user switching menu"
+  defaults -currentHost write com.apple.controlcenter UserSwitcher -int 24
 }
 
 configure_keyboard() {
@@ -436,6 +527,7 @@ clone_dotfiles_repository() {
   # Login to GitHub and add the public SSH key to my account.
   # TODO: Automate this process.
   printf '%s\n' "Login to GitHub and add the public SSH key to your account."
+  open -a Firefox 'https://github.com/login'
   read -r
 
   case "${dotfiles_repository}" in
@@ -462,7 +554,7 @@ clone_dotfiles_repository() {
 
 configure_zsh() {
   # Create /etc/zshenv to export ZDOTDIR
-  cat << 'EOF' | sudo tee /etc/zshenv
+  cat << 'EOF' | sudo tee /etc/zshenv > /dev/null
 # /etc/zshenv: system-wide .zshenv file for zsh(1).
 #
 # This file is sourced on all invocations of the shell.
@@ -486,8 +578,10 @@ EOF
 
   mkdir -p "${XDG_DATA_HOME}/zsh"
 
-  :  # Symlink ZSH configuration.
+  # Manually symlink the ZSH configuration.
   # TODO: Automate this process.
+  printf '%s\n' "Symlink the ZSH configuration to the dotfiles directory."
+  read -r
 
   # Cleanup ZSH files left over from fresh install.
   rm -f "${HOME}/.zsh_history"
@@ -497,7 +591,10 @@ EOF
 # Cleanup Items
 
 import_terminal_profile() {
-  :  # This can't be automated as far as I can tell.
+  # Manually import the Terminal profile.
+  # TODO: Automate this process.
+  printf '%s\n' "Import a profile into the Terminal application."
+  read -r
 }
 
 configure_vim() {
@@ -505,23 +602,32 @@ configure_vim() {
   mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}/vim"
   mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/vim"
 
-  :  # Symlink Vim configuration.
+  # Manually symlink the Vim configuration.
   # TODO: Automate this process.
+  printf '%s\n' "Symlink the Vim configuration to the dotfiles directory."
+  read -r
 
   # Cleanup Vim files left over from fresh install.
   rm -f "${HOME}/.viminfo"
 }
 
 configure_git() {
-  :  # Symlink Git configuration.
+  # Manually symlink the Git configuration.
   # TODO: Automate this process.
-  :  # Create a config-personal file with email and signing key configured.
+  printf '%s\n' "Symlink the Git configuration to the dotfiles directory."
+  read -r
+
+  # Manually create a config-personal file with email and signing key.
   # TODO: Automate this process.
+  printf '%s\n' "Create a config-personal file with email and signing key."
+  read -r
 }
 
 configure_gnupg() {
-  :  # Symlink GnuPG configuration.
+  # Manually symlink the GnuPG configuration.
   # TODO: Automate this process.
+  printf '%s\n' "Symlink the GnuPG configuration to the dotfiles directory."
+  read -r
 }
 
 configure_less() {
@@ -538,8 +644,12 @@ setup_rectangle() {
   if [ ! -d /Applications/Rectangle.app ]; then
     brew install --cask rectangle
   fi
-  :  # Configure the application.
+
+  # Manually configure Rectangle.
   # TODO: Automate this process.
+  printf '%s\n' "Configure the Rectangle app."
+  open -a Rectangle
+  read -r
 }
 
 main() {
@@ -559,7 +669,7 @@ main() {
     sudo -n true; sleep 60; kill -0 "$$" || exit; 
   done 2>/dev/null &
 
-#  capitalize_username
+  capitalize_username
   setup_xdg_directories
   add_source_directory
   install_homebrew
@@ -567,15 +677,14 @@ main() {
   setup_gnupg
   setup_pass
 
-#  login_apple_id
-#  login_exchange
+  login_apple_id
+  login_exchange
 
 # Security and Privacy settings require sudo.
   configure_security_and_privacy
 # Security and Privacy settings require sudo.
   configure_software_update
-  configure_bluetooth
-  configure_sound
+  configure_control_center
 # Keyboard requires Logout/Login for all settings to take affect.
   configure_keyboard
 #  configure_displays
@@ -592,7 +701,7 @@ main() {
   clone_dotfiles_repository
   configure_zsh
 
-#  import_terminal_profile
+  import_terminal_profile
   configure_vim
   configure_git
   configure_gnupg
@@ -603,8 +712,12 @@ main() {
 # Dock requires applications to be installed first.
 #  configure_dock_and_menu_bar
 # Spotlight requires a reboot.
-#  configure_spotlight
+  configure_spotlight
+
+  # Reboot to rebuild the Spotlight Index.
+  #sudo reboot
+  printf '%s\n' "Reboot the machine now."
+  read -r
 }
 
 main "$@"
-
