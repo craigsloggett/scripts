@@ -47,6 +47,9 @@ generate_dock_app_entry() {
 # Prepare the OS
 
 capitalize_username() {
+  # TODO: Add configuration for a username and only check for capitalization
+  #       if needed.
+
   # Remove everything before the final forward-slash '/'.
   basename="${HOME##*/}"
 
@@ -303,6 +306,8 @@ EOF
 </plist>
 EOF
   fi
+
+  # TODO: Add a reboot required flag.
 }
 
 configure_security_and_privacy() {
@@ -355,10 +360,6 @@ configure_keyboard() {
 }
 
 configure_displays() {
-  :  #
-}
-
-configure_mouse() {
   :  #
 }
 
@@ -652,6 +653,58 @@ setup_rectangle() {
   read -r
 }
 
+setup_signal() {
+  # Install Signal with Homebrew (Cask)
+  if [ ! -d /Applications/Signal.app ]; then
+    brew install --cask signal
+  fi
+
+  # Manually configure Signal.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Signal."
+  open -a Signal
+  read -r
+}
+
+setup_slack() {
+  # Install Slack with Homebrew (Cask)
+  if [ ! -d /Applications/Slack.app ]; then
+    brew install --cask slack
+  fi
+
+  # Manually configure Slack.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Slack."
+  open -a Slack
+  read -r
+}
+
+setup_microsoft_teams() {
+  # Install Microsoft Teams with Homebrew (Cask)
+  if [ ! -d "/Applications/Microsoft Teams.app" ]; then
+    brew install --cask microsoft-teams
+  fi
+
+  # Manually configure Microsoft Teams.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Microsoft Teams."
+  open -a "Microsoft Teams"
+  read -r
+}
+
+setup_zoom() {
+  # Install Zoom with Homebrew (Cask)
+  if [ ! -d "/Applications/zoom.us.app" ]; then
+    brew install --cask zoom
+  fi
+
+  # Manually configure Zoom.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Zoom."
+  open -a zoom.us
+  read -r
+}
+
 main() {
   # Turn on Debugging Output
   export PS4=" -> + "
@@ -688,7 +741,6 @@ main() {
 # Keyboard requires Logout/Login for all settings to take affect.
   configure_keyboard
 #  configure_displays
-#  configure_mouse
   configure_battery
 
   configure_finder
@@ -708,6 +760,10 @@ main() {
   configure_less
 
   setup_rectangle
+  setup_signal
+  setup_slack
+  setup_microsoft_teams
+  setup_zoom
 
 # Dock requires applications to be installed first.
 #  configure_dock_and_menu_bar
