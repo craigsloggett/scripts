@@ -482,7 +482,7 @@ setup_firefox() {
   # Firefox must be run once before the default-release folder is generated.
   if [ ! -d "${HOME}/Library/Application Support/Firefox/Profiles/" ]; then
   	printf '%s\n' "Opening Firefox to generate the default-release folder."
-    /Applications/Firefox.app/Contents/MacOS/./firefox &
+    open -a Firefox
 		printf '%s\n'	"Waiting 10 seconds before closing automatically..."
     sleep 10
     kill -9 "$(pgrep firefox)"
@@ -495,6 +495,12 @@ setup_firefox() {
   # The rest can't be automated as far as I can tell.
   :  # Login to Sync
   :  # Turn syncing on only for Bookmarks.
+
+  # Manually configure Firefox.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Firefox."
+  open -a Firefox
+  read -r
 }
 
 clone_dotfiles_repository() {
@@ -765,8 +771,8 @@ main() {
   setup_microsoft_teams
   setup_zoom
 
-# Dock requires applications to be installed first.
-#  configure_dock_and_menu_bar
+# Dock requires some applications to be installed first.
+  configure_dock_and_menu_bar
 # Spotlight requires a reboot.
   configure_spotlight
 
