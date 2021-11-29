@@ -2,6 +2,15 @@
 #
 # setup.sh - macOS installation shell script.
 
+configuration() {
+  # Setup configuration variables.
+  export SOURCE_DIRECTORY="${SOURCE_DIRECTORY:-${HOME}/Source}"
+  export SSH_KEY_FILENAME="${SSH_KEY_FILENAME:-id_ed25519}"
+  export GPG_PUBLIC_KEY="${GPG_PUBLIC_KEY:-23BF43EF}"
+  export GPG_KEY_FILENAME="${GPG_KEY_FILENAME:-secret-subkeys.gpg}"
+  export DOTFILES_REPOSITORY="${DOTFILES_REPOSITORY:-github.com:nerditup/dotfiles.git}"
+}
+
 # Helper Functions
 
 generate_dock_app_entry() {
@@ -97,8 +106,8 @@ setup_xdg_directories() {
 }
 
 add_source_directory() {
-  source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
-    mkdir -p "${source_directory}"
+  source_directory="${SOURCE_DIRECTORY}"
+  mkdir -p "${source_directory}"
 }
 
 install_homebrew() {
@@ -113,7 +122,7 @@ install_homebrew() {
 # Command Line Utilities
 
 configure_ssh() {
-  ssh_key_filename="${SSH_KEY_FILENAME:-id_ed25519}"
+  ssh_key_filename="${SSH_KEY_FILENAME}"
 
   if [ ! -f "${HOME}/.ssh/${ssh_key_filename}" ]; then
     ssh-keygen -f "${HOME}/.ssh/${ssh_key_filename}" -t ed25519 -q -N ""
@@ -129,8 +138,8 @@ setup_gnupg() {
   export GNUPGHOME="${XDG_DATA_HOME:-${HOME}/.local/share}/gnupg"
 
   # Configuration Options
-  gpg_public_key="${GPG_PUBLIC_KEY:-23BF43EF}"
-  gpg_key_filename="${GPG_KEY_FILENAME:-secret-subkeys.gpg}"
+  gpg_public_key="${GPG_PUBLIC_KEY}"
+  gpg_key_filename="${GPG_KEY_FILENAME}"
 
   # Install gnupg with Homebrew.
   if ! command -v gpg > /dev/null; then
@@ -211,7 +220,6 @@ configure_dock_and_menu_bar() {
   defaults delete com.apple.dock recent-apps
 
   # Configure which applications are in the Dock in a declarative way.
-  defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Firefox")"
   defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Mail")"
   defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Calendar")"
   defaults write com.apple.dock persistent-apps -array-add "$(generate_dock_app_entry "Reminders")"
@@ -262,10 +270,6 @@ configure_spotlight() {
 #!/bin/sh
 #
 # rebuild_spotlight_index.sh - Rebuild the Spotlight index from scratch.
-
-# Turn on Debugging Output
-export PS4=" -> + "
-set -x
 
 # Globally enable exit-on-error and require variables to be set.
 set -o errexit
@@ -504,9 +508,9 @@ setup_firefox() {
 }
 
 clone_dotfiles_repository() {
-  ssh_key_filename="${SSH_KEY_FILENAME:-id_ed25519}"
-	source_directory="${SOURCE_DIRECTORY:-${HOME}/Source}"
-	dotfiles_repository="${DOTFILES_REPOSITORY:-github.com:nerditup/dotfiles.git}"
+  ssh_key_filename="${SSH_KEY_FILENAME}"
+	source_directory="${SOURCE_DIRECTORY}"
+	dotfiles_repository="${DOTFILES_REPOSITORY}"
 
   if ! command -v git > /dev/null; then
     :  # Git is required to clone the dotfiles.
@@ -714,7 +718,7 @@ setup_zoom() {
 main() {
   # Turn on Debugging Output
   export PS4=" -> + "
-  set -x
+  set -o xtrace
 
   # Globally enable exit-on-error and require variables to be set.
   set -o errexit
@@ -728,6 +732,7 @@ main() {
     sudo -n true; sleep 60; kill -0 "$$" || exit; 
   done 2>/dev/null &
 
+  configuration
   capitalize_username
   setup_xdg_directories
   add_source_directory
@@ -769,7 +774,7 @@ main() {
   setup_signal
   setup_slack
   setup_microsoft_teams
-  setup_zoom
+#  setup_zoom
 
 # Dock requires some applications to be installed first.
   configure_dock_and_menu_bar
