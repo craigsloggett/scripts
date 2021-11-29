@@ -237,6 +237,8 @@ configure_spotlight() {
     osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preference.spotlight" activate'
   fi
 
+  # ADD WAIT
+
   if ! defaults read com.apple.spotlight orderedItems | grep -B 1 "SOURCE" | grep -q "enabled = 0;"; then
 
     printf '%s\n' "Configuring Spotlight..."
