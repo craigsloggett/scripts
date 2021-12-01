@@ -154,7 +154,7 @@ setup_gnupg() {
   # TODO: Automate this process.
   printf '%s %s\n' "Download the relevant GPG keys and put them in:" \
                    "${HOME}/Downloads/${gpg_key_filename}"
-  read -r 
+  read -r
 
   # Import the GPG keys if not imported already.
   if ! gpg -k | grep -q "${gpg_public_key}"; then
@@ -242,7 +242,7 @@ configure_spotlight() {
   if ! defaults read com.apple.spotlight orderedItems | grep -B 1 "SOURCE" | grep -q "enabled = 0;"; then
 
     printf '%s\n' "Configuring Spotlight..."
-    
+
     defaults write com.apple.spotlight orderedItems -array \
       '{"enabled" = 1;"name" = "APPLICATIONS";}' \
      	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
@@ -483,7 +483,7 @@ setup_firefox() {
   # Install Firefox with Homebrew.
   if [ ! -d /Applications/Firefox.app ]; then
     brew install --cask firefox
-  fi  
+  fi
 
   # Firefox must be run once before the default-release folder is generated.
   if [ ! -d "${HOME}/Library/Application Support/Firefox/Profiles/" ]; then
@@ -493,7 +493,7 @@ setup_firefox() {
     sleep 10
     kill -9 "$(pgrep firefox)"
     sleep 5
-  fi  
+  fi
 
   # Copy the user.js to the Firefox directory....
   # TODO: do this automatically.
@@ -532,7 +532,7 @@ clone_dotfiles_repository() {
   if [ ! -d /Applications/Firefox.app ]; then
     :  # Firefox is needed to add an SSH key to GitHub.
     :  # TODO: Decide what to do if this requirement is not met.
-  fi  
+  fi
 
 	pbcopy < "${HOME}/.ssh/${ssh_key_filename}.pub"
 	printf '%s\n' "Public SSH key copied to the clipboard."
@@ -548,10 +548,10 @@ clone_dotfiles_repository() {
       username="${dotfiles_repository##*github.com}"
       username="${username:1}"
       username="${username%%/*}"
-      
+
       reponame="${dotfiles_repository##*/}"
       reponame="${reponame%%.git}"
-      
+
       if [ ! -d "${source_directory}/GitHub/${username}/${reponame}" ]; then
         mkdir -p "${source_directory}/GitHub/${username}"
         git clone "${dotfiles_repository}" "${source_directory}/GitHub/${username}/${reponame}"
@@ -730,8 +730,8 @@ main() {
   sudo -v
 
   # Keep-alive: update existing `sudo` time stamp until script has finished.
-  while true; do 
-    sudo -n true; sleep 60; kill -0 "$$" || exit; 
+  while true; do
+    sudo -n true; sleep 60; kill -0 "$$" || exit;
   done 2>/dev/null &
 
   configuration
