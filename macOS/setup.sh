@@ -546,7 +546,7 @@ clone_dotfiles_repository() {
   case "${dotfiles_repository}" in
     *github*)
       username="${dotfiles_repository##*github.com}"
-      username="${username:1}"
+      username="${username##[/|:]}"
       username="${username%%/*}"
 
       reponame="${dotfiles_repository##*/}"
