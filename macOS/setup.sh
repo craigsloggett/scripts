@@ -2,63 +2,57 @@
 #
 # setup.sh - macOS installation shell script.
 
+log() {
+  log_message="${1}"
+
+  printf '%b --> %b%s%b\n' \
+      "${yellow}" "${blue}" "${log_message}" "${reset}" >&2
+}
+
+success() {
+  log_message="${1}"
+  debug="${DEBUG_MODE:-}"
+
+  printf '%b   %s %b%s\n' "${green}" '✓' "${reset}" "${log_message}"
+
+  if [ -n "${debug}" ] || [ "${debug}" = "false" ]; then
+    printf '\n%s\n' "Press enter to continue."
+    read -r
+  else
+    printf '\n'
+  fi
+}
+
+fail() {
+  log_message="${1}"
+
+  printf '%b   %s %b%s\n' "${red}" 'x' "${reset}" "${log_message}"
+  printf '%s\n' "Configuration failed, stopping script."
+  exit 1
+}
+
 configuration() {
   # Setup configuration variables.
   export SOURCE_DIRECTORY="${SOURCE_DIRECTORY:-${HOME}/Source}"
   export SSH_KEY_FILENAME="${SSH_KEY_FILENAME:-id_ed25519}"
   export GPG_PUBLIC_KEY="${GPG_PUBLIC_KEY:-23BF43EF}"
   export GPG_KEY_FILENAME="${GPG_KEY_FILENAME:-secret-subkeys.gpg}"
-  export DOTFILES_REPOSITORY="${DOTFILES_REPOSITORY:-github.com:nerditup/dotfiles.git}"
-}
+  export DOTFILES_REPO="${DOTFILES_REPO:-github.com:nerditup/dotfiles.git}"
 
-# Helper Functions
+  # Output the configuration.
+  printf '%s\n\n' "Using the following configuration:"
+  printf '%s\n'   "   SOURCE_DIRECTORY  ${SOURCE_DIRECTORY}"
+  printf '%s\n'   "   SSH_KEY_FILENAME  ${SSH_KEY_FILENAME}"
+  printf '%s\n'   "   GPG_PUBLIC_KEY    ${GPG_PUBLIC_KEY}"
+  printf '%s\n'   "   GPG_KEY_FILENAME  ${GPG_KEY_FILENAME}"
+  printf '%s\n\n' "   DOTFILES_REPO     ${DOTFILES_REPO}"
 
-generate_dock_app_entry() {
-  # Return the configuration required to add an app to the Dock.
-  app_name="$1"
-  app_path=""
-
-  # Most apps are in /Applications with the exception of what is
-  # listed here.
-  case "${app_name}" in
-    Mail)
-      app_path="/System/Applications"
-      ;;
-    Calendar)
-      app_path="/System/Applications"
-      ;;
-    Reminders)
-      app_path="/System/Applications"
-      ;;
-    Notes)
-      app_path="/System/Applications"
-      ;;
-    Terminal)
-      app_path="/System/Applications/Utilities"
-      ;;
-    *)
-      app_path="/Applications"
-      ;;
-  esac
-
-  printf '<dict>
-            <key>tile-data</key>
-              <dict>
-                <key>file-data</key>
-                  <dict>
-                    <key>_CFURLString</key><string>/%s/%s.app</string>
-                    <key>_CFURLStringType</key><integer>0</integer>
-                  </dict>
-              </dict>
-          </dict>' "${app_path}" "${app_name}"
+  success 'Configuration has been set.'
 }
 
 # Prepare the OS
 
 capitalize_username() {
-  # TODO: Add configuration for a username and only check for capitalization
-  #       if needed.
-
   # Remove everything before the final forward-slash '/'.
   basename="${HOME##*/}"
 
@@ -80,11 +74,12 @@ capitalize_username() {
                   ' 7. Rename the Home Directory to match the capital letter.' \
                   ' 8. Logout then login with your account.' \
                   ' 9. Delete the temporary account.'
-      exit 1
+
+      fail 'Username is not capitalized.'
     ;;
 
     *)
-      :  # The username is capitalized, do nothing.
+      success 'Username is capitalized.'
     ;;
   esac
 }
@@ -103,105 +98,28 @@ setup_xdg_directories() {
   mkdir -p "$XDG_DATA_HOME"
   mkdir -p "$XDG_BIN_HOME"
   mkdir -p "$XDG_LIB_HOME"
+
+  success 'XDG directories created.'
 }
 
 add_source_directory() {
   source_directory="${SOURCE_DIRECTORY}"
   mkdir -p "${source_directory}"
+
+  success 'Source directory created.'
 }
 
 install_homebrew() {
   # Homebrew (taken from their website)
   # https://brew.sh/
   brew_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+
   if ! command -v brew > /dev/null; then
-    /bin/bash -c "$(curl -fsSL ${brew_url})"
+    /bin/bash -c "$(curl -fsSL ${brew_url})" || \
+    fail 'Homebrew is not installed.'
+  else
+    success 'Homebrew is installed.'
   fi
-}
-
-# Command Line Utilities
-
-configure_ssh() {
-  ssh_key_filename="${SSH_KEY_FILENAME}"
-
-  if [ ! -f "${HOME}/.ssh/${ssh_key_filename}" ]; then
-    ssh-keygen -f "${HOME}/.ssh/${ssh_key_filename}" -t ed25519 -q -N ""
-  fi
-
-  # Copy the public SSH key to my server.
-  # TODO: Automate this process.
-  printf '%s\n' "Distribute the public key now."
-  read -r
-}
-
-setup_gnupg() {
-  export GNUPGHOME="${XDG_DATA_HOME:-${HOME}/.local/share}/gnupg"
-
-  # Configuration Options
-  gpg_public_key="${GPG_PUBLIC_KEY}"
-  gpg_key_filename="${GPG_KEY_FILENAME}"
-
-  # Install gnupg with Homebrew.
-  if ! command -v gpg > /dev/null; then
-    brew install gnupg
-  fi
-
-  # Setup the GPG directory.
-  mkdir -p "$GNUPGHOME"
-  chmod 700 "$GNUPGHOME"
-
-  # Copy the GPG keys from my server.
-  # TODO: Automate this process.
-  printf '%s %s\n' "Download the relevant GPG keys and put them in:" \
-                   "${HOME}/Downloads/${gpg_key_filename}"
-  read -r
-
-  # Import the GPG keys if not imported already.
-  if ! gpg -k | grep -q "${gpg_public_key}"; then
-    gpg --import "${HOME}/Downloads/${gpg_key_filename}"
-  fi
-
-  # Set the trust level on the GPG keys if not set.
-  if gpg -k | grep 'uid' | grep -q 'unknown'; then
-    printf '%s %s\n' "Set the trust level of the imported keys:" \
-                     "gpg --edit-key ${gpg_public_key}"
-    read -r
-  fi
-}
-
-setup_pass() {
-  export PASSWORD_STORE_DIR="${XDG_DATA_HOME:=${HOME}/.local/share}/pass"
-
-  if ! command -v gpg > /dev/null; then
-    :  # GnuPG being configured is a requirement.
-    :  # TODO: Decide what to do if this requirement is not met.
-  fi
-
-  if ! command -v pass > /dev/null; then
-    brew install pass
-  fi
-
-  if [ ! -d "${PASSWORD_STORE_DIR}" ]; then
-    printf '%s\n' "Clone the password store repository to: \
-                   ${PASSWORD_STORE_DIR}"
-    read -r
-  fi
-}
-
-# Login to the appropriate accounts.
-
-login_apple_id() {
-  :  # This can't be automated as far as I can tell.
-  printf '%s\n' "Login to your Apple account."
-  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.AppleIDPrefPane" activate'
-  read -r
-}
-
-login_exchange() {
-  :  # This can't be automated as far as I can tell.
-  printf '%s\n' "Login to your Exchange account."
-  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.internetaccounts" activate'
-  read -r
 }
 
 # The following functions encapsulate the System Preferences by the same name.
@@ -317,24 +235,79 @@ EOF
 }
 
 configure_security_and_privacy() {
+  firewall_defaults="/Library/Preferences/com.apple.alf"
+  firewall_state="$(sudo defaults read ${firewall_defaults} globalstate)"
+
   # Turn on Firewall
-  sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+  log 'Verifying the Application Layer Firewall is enabled...'
+  if [ ! "${firewall_state}" -eq 1 ]; then
+    sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+  else
+    success 'Application Layer Firewall is enabled. '
+  fi
+
   # Turn on FileVault
+  log 'Verifying FileVault is enabled...'
   if sudo fdesetup status | grep -q 'FileVault is Off.'; then
-    printf '%s\n' "Enabling FileVault, please follow the prompts:"
+    printf '%s\n%s\n' "FileVault is not enabled, trying to enable it..." \
+                      "Enabling FileVault, please follow the prompts:"
     sudo fdesetup enable
   fi
+
+  # Check if FileVault was successfully enabled.
+  if sudo fdesetup status | grep -q 'FileVault is Off.'; then
+    fail 'FileVault is not enabled. '
+  else
+    success 'FileVault is enabled. '
+  fi
+}
+
+verify_defaults_true() {
+  default="${1}"
+  default_description="${2}"
+
 }
 
 configure_software_update() {
   # Check 'Automatically keep my Mac up to date'
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+  log "Verifying \"${default_description}\" is enabled..."
+  state="$( defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled )"
+
+  if [ ! "${state}" -eq 1 ]; then
+    fail "\"${default_description}\" is not enabled."
+  else
+    success "\"${default_description}\" is enabled."
+  fi
+
+
+  default="/Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled"
+  default_description="Automatically keep my Mac up to date"
+  verify_defaults_true "${default}" "${default_description}"
+
   # Check everything under 'Advanced'
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool true
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
-  sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
-  sudo defaults write /Library/Preferences/com.apple.commerce ConfigDataInstall -bool true
-  sudo defaults write /Library/Preferences/com.apple.commerce CriticalUpdateInstall -bool true
+  default="/Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload"
+  default_description="Automatically: Check for updates"
+  verify_defaults_true "${default}" "${default_description}"
+
+  default="/Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload"
+  default_description="Automatically: Download new updates when available"
+  verify_defaults_true "${default}" "${default_description}"
+
+  default="/Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates"
+  default_description="Automatically: Install macOS updates"
+  verify_defaults_true "${default}" "${default_description}"
+
+  default="/Library/Preferences/com.apple.commerce AutoUpdate"
+  default_description="Automatically: Install app updates from the App Store"
+  verify_defaults_true "${default}" "${default_description}"
+
+  default="/Library/Preferences/com.apple.commerce ConfigDataInstall"
+  default_description="Automatically: Install system data files and security updates"
+  verify_defaults_true "${default}" "${default_description}"
+
+  default="/Library/Preferences/com.apple.commerce CriticalUpdateInstall"
+  default_description="Automatically: Download new updates when available"
+  verify_defaults_true "${default}" "${default_description}"
 }
 
 configure_control_center() {
@@ -474,45 +447,12 @@ configure_calendar() {
   :  #
 }
 
-setup_firefox() {
-  if ! command -v pass > /dev/null; then
-    :  # Passwords are needed to setup Firefox.
-    :  # TODO: Decide what to do if this requirement is not met.
-  fi
-
-  # Install Firefox with Homebrew.
-  if [ ! -d /Applications/Firefox.app ]; then
-    brew install --cask firefox
-  fi
-
-  # Firefox must be run once before the default-release folder is generated.
-  if [ ! -d "${HOME}/Library/Application Support/Firefox/Profiles/" ]; then
-  	printf '%s\n' "Opening Firefox to generate the default-release folder."
-    open -a Firefox
-		printf '%s\n'	"Waiting 10 seconds before closing automatically..."
-    sleep 10
-    kill -9 "$(pgrep firefox)"
-    sleep 5
-  fi
-
-  # Copy the user.js to the Firefox directory....
-  # TODO: do this automatically.
-
-  # The rest can't be automated as far as I can tell.
-  :  # Login to Sync
-  :  # Turn syncing on only for Bookmarks.
-
-  # Manually configure Firefox.
-  # TODO: Automate this process.
-  printf '%s\n' "Configure Firefox."
-  open -a Firefox
-  read -r
-}
+# Command Line Utilities
 
 clone_dotfiles_repository() {
   ssh_key_filename="${SSH_KEY_FILENAME}"
 	source_directory="${SOURCE_DIRECTORY}"
-	dotfiles_repository="${DOTFILES_REPOSITORY}"
+	dotfiles_repository="${DOTFILES_REPO}"
 
   if ! command -v git > /dev/null; then
     :  # Git is required to clone the dotfiles.
@@ -601,7 +541,16 @@ EOF
   rm -rf "${HOME}/.zsh_sessions"
 }
 
-# Cleanup Items
+generate_ssh_key() {
+  ssh_key_filename="${SSH_KEY_FILENAME}"
+
+  if [ ! -f "${HOME}/.ssh/${ssh_key_filename}" ]; then
+    ssh-keygen -f "${HOME}/.ssh/${ssh_key_filename}" -t ed25519 -q -N "" || \
+    fail 'The configured SSH key does not exist.'
+  else
+    success 'The configured SSH key exists.'
+  fi
+}
 
 import_terminal_profile() {
   # Manually import the Terminal profile.
@@ -651,6 +600,41 @@ configure_less() {
 }
 
 # Additional Applications
+
+setup_firefox() {
+  if ! command -v pass > /dev/null; then
+    :  # Passwords are needed to setup Firefox.
+    :  # TODO: Decide what to do if this requirement is not met.
+  fi
+
+  # Install Firefox with Homebrew.
+  if [ ! -d /Applications/Firefox.app ]; then
+    brew install --cask firefox
+  fi
+
+  # Firefox must be run once before the default-release folder is generated.
+  if [ ! -d "${HOME}/Library/Application Support/Firefox/Profiles/" ]; then
+  	printf '%s\n' "Opening Firefox to generate the default-release folder."
+    open -a Firefox
+		printf '%s\n'	"Waiting 10 seconds before closing automatically..."
+    sleep 10
+    kill -9 "$(pgrep firefox)"
+    sleep 5
+  fi
+
+  # Copy the user.js to the Firefox directory....
+  # TODO: do this automatically.
+
+  # The rest can't be automated as far as I can tell.
+  :  # Login to Sync
+  :  # Turn syncing on only for Bookmarks.
+
+  # Manually configure Firefox.
+  # TODO: Automate this process.
+  printf '%s\n' "Configure Firefox."
+  open -a Firefox
+  read -r
+}
 
 setup_rectangle() {
   # Install Rectangle with Homebrew (Cask)
@@ -717,76 +701,154 @@ setup_zoom() {
   read -r
 }
 
+generate_dock_app_entry() {
+  # Return the configuration required to add an app to the Dock.
+  app_name="$1"
+  app_path=""
+
+  # Most apps are in /Applications with the exception of what is
+  # listed here.
+  case "${app_name}" in
+    Mail)
+      app_path="/System/Applications"
+      ;;
+    Calendar)
+      app_path="/System/Applications"
+      ;;
+    Reminders)
+      app_path="/System/Applications"
+      ;;
+    Notes)
+      app_path="/System/Applications"
+      ;;
+    Terminal)
+      app_path="/System/Applications/Utilities"
+      ;;
+    *)
+      app_path="/Applications"
+      ;;
+  esac
+
+  printf '<dict>
+            <key>tile-data</key>
+              <dict>
+                <key>file-data</key>
+                  <dict>
+                    <key>_CFURLString</key><string>/%s/%s.app</string>
+                    <key>_CFURLStringType</key><integer>0</integer>
+                  </dict>
+              </dict>
+          </dict>' "${app_path}" "${app_name}"
+}
+
+# Login to the appropriate accounts.
+
+login_apple_id() {
+  :  # This can't be automated as far as I can tell.
+  printf '%s\n' "Login to your Apple account."
+  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.AppleIDPrefPane" activate'
+  read -r
+}
+
+login_exchange() {
+  :  # This can't be automated as far as I can tell.
+  printf '%s\n' "Login to your Exchange account."
+  osascript -e 'tell application "System Preferences" to reveal pane "com.apple.preferences.internetaccounts" activate'
+  read -r
+}
+
 main() {
   # Turn on Debugging Output
-  export PS4=" -> + "
-  set -o xtrace
+  export DEBUG_MODE='true'
+#  export PS4=" -> + "
+#  set -o xtrace
 
   # Globally enable exit-on-error and require variables to be set.
   set -o errexit
   set -o nounset
 
+  # Define colours for output text.
+  readonly red='\033[1;31m'
+  readonly green='\033[1;32m'
+  readonly yellow='\033[1;33m'
+  readonly blue='\033[1;34m'
+  readonly reset='\033[m'
+
+  log 'Begin macOS configuration.'
+
   # Ask for the administrator password upfront.
+  log 'Root privileges are required for most of the configuration.'
+  log 'sudo: Asking for the user password...'
   sudo -v
 
-  # Keep-alive: update existing `sudo` time stamp until script has finished.
+  # Keep-alive: Update existing `sudo` time stamp until script has finished.
   while true; do
     sudo -n true; sleep 60; kill -0 "$$" || exit;
   done 2>/dev/null &
 
+  log 'Checking the environment for configuration...'
   configuration
+
+  log 'Verifying the username has been capitalized...'
   capitalize_username
+
+  log 'Creating XDG directories...'
   setup_xdg_directories
+
+  log 'Creating a Source code directory...'
   add_source_directory
+
+  log 'Verifying Homebrew has been installed...'
   install_homebrew
-  configure_ssh
-  setup_gnupg
-  setup_pass
 
-  login_apple_id
-  login_exchange
+  log 'Verifying the configured SSH key exists...'
+  generate_ssh_key
 
-# Security and Privacy settings require sudo.
+  log 'Verifying Security and Privacy Preferences...'
   configure_security_and_privacy
-# Security and Privacy settings require sudo.
+
+  log 'Verifying Software Update Preferences...'
   configure_software_update
-  configure_control_center
-# Keyboard requires Logout/Login for all settings to take affect.
-  configure_keyboard
-#  configure_displays
-  configure_battery
+#  configure_control_center
+## Keyboard requires Logout/Login for all settings to take affect.
+#  configure_keyboard
+##  configure_displays
+#  configure_battery
+#
+#  configure_finder
+#  configure_safari
+#  configure_textedit
+##  configure_mail
+##  configure_calendar
+#
+#  setup_firefox
+#  clone_dotfiles_repository
+#  configure_zsh
+#
+#  import_terminal_profile
+#  configure_vim
+#  configure_git
+#  configure_gnupg
+#  configure_less
+#
+#  setup_rectangle
+#  setup_signal
+#  setup_slack
+#  setup_microsoft_teams
+##  setup_zoom
+#
+## Dock requires some applications to be installed first.
+#  configure_dock_and_menu_bar
+## Spotlight requires a reboot.
+#  configure_spotlight
 
-  configure_finder
-  configure_safari
-  configure_textedit
-#  configure_mail
-#  configure_calendar
-
-  setup_firefox
-  clone_dotfiles_repository
-  configure_zsh
-
-  import_terminal_profile
-  configure_vim
-  configure_git
-  configure_gnupg
-  configure_less
-
-  setup_rectangle
-  setup_signal
-  setup_slack
-  setup_microsoft_teams
-#  setup_zoom
-
-# Dock requires some applications to be installed first.
-  configure_dock_and_menu_bar
-# Spotlight requires a reboot.
-  configure_spotlight
-
-  # Reboot to rebuild the Spotlight Index.
-  #sudo reboot
-  printf '%s\n' "Reboot the machine now."
-  read -r
+#  login_apple_id
+#  login_exchange
+#
+#  # Reboot to rebuild the Spotlight Index.
+#  #sudo reboot
+#  printf '%s\n' "Reboot the machine now."
+#  read -r
 }
 
 main "$@"
