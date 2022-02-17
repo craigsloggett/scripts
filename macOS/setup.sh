@@ -2,12 +2,12 @@
 #
 # setup.sh - macOS installation shell script.
 
-log() {
-  log_message="${1}"
+# Source the logging utility.
 
-  printf '%b --> %b%s%b\n' \
-      "${yellow}" "${blue}" "${log_message}" "${reset}" >&2
-}
+# shellcheck source=/dev/null
+. ~/.local/lib/shell/logging
+# shellcheck source=/dev/null
+. ~/.local/lib/shell/file
 
 success() {
   log_message="${1}"
