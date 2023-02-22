@@ -164,6 +164,22 @@ Application Preferences
      - Save As Library.photoslibrary
    - Delete the default .photoslibrary file in ~/Pictures
 
+ - Music
+   - Move the Music library (out of the Music folder)
+     - Press and hold the Option (⌥) key while you open Music.
+     - Create a new directory, ~/Library/Music
+     - Choose ~/Library/Music as the destination
+     - Save As Music
+   - Delete the default Music subdirectory in ~/Music
+
+ - TV
+   - Move the TV library (out of the Movies folder)
+     - Press and hold the Option (⌥) key while you open TV.
+     - Create a new directory, ~/Library/TV
+     - Choose ~/Library/TV as the destination
+     - Save As TV
+   - Delete the default TV subdirectory in ~/Movies
+
 Install and Configure Firefox
 -----------------------------
  - Requires Pass
