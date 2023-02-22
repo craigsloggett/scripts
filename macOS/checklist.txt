@@ -157,6 +157,13 @@ Application Preferences
  - Calendar
    - ...
 
+ - Photos
+   - Move the photos library (out of the Pictures folder)
+     - Press and hold the Option (⌥) key while you open Photos.
+     - Choose ~/Library/Photos/Libraries as the destination
+     - Save As Library.photoslibrary
+   - Delete the default .photoslibrary file in ~/Pictures
+
 Install and Configure Firefox
 -----------------------------
  - Requires Pass
