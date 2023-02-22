@@ -14,9 +14,7 @@ Prepare the OS
    - Reminders
    - Notes
 
- - Add a Directory named "Source" in Home
-   - Change the icon to "DeveloperFolderIcon.icns" found in,
-     - /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/
+ - Add a Directory named "Developer" in Home
 
  - Install Homebrew
    - Paste the following into the macOS Terminal,
@@ -108,10 +106,11 @@ Application Preferences
      - Update "New Finder windows show:" to Home
    - Sidebar
      - Uncheck all "Favourites" options except for the following:
-       - Applications
-       - Downloads
        - Home
        - Desktop
+       - Applications
+       - Developer
+       - Downloads
      - Uncheck all "iCloud" options.
      - Check "User's MacBook Pro" option under Locations.
      - Uncheck all "Tags" options.
@@ -149,7 +148,7 @@ Application Preferences
    - Open and Save
      - When Opening a File
        - Check "Display HTML files as HTML code instead of formatted text"
-     - When Saving a File  
+     - When Saving a File
        - Uncheck "Add ".txt" extension to plain text files"
 
  - Mail
@@ -196,20 +195,6 @@ Install and Configure Firefox
    - Firefox Multi-Account Containers
    - Dark Reader
    - Decentraleyes
-   - ClearURLs
-     - Copy ClearURLs settings from Server
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/ClearURLs\ -\ YYYY-MM-DD.conf .
-     - Import settings into the extension
-   - Cookie AutoDelete
-     - Copy CAD settings from Server
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Cookie\ AutoDelete\ Core\ -\ YYYY-MM-DD.json .
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Cookie\ AutoDelete\ Expressions\ -\ YYYY-MM-DD.json .
-     - Import Core settings into the extension
-     - Import Expressions settings into the extension
-   - NoScript
-     - Copy NoScript settings from Server
-       - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/NoScript\ -\ YYYY-MM-DD.txt .
-     - Import settings into the extension
    - uBlock Origin
      - Copy uBlock Origin settings from Server
        - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/uBlock\ Origin\ -\ YYYY-MM-DD.txt .
@@ -220,30 +205,16 @@ Clone Dotfiles
  - Requires Firefox, SSH, Pass
  - Login to GitHub and add SSH key.
  - Prepare the dotfiles source directory
-   - $ mkdir -p ~/Source/GitHub/nerditup
+   - $ mkdir -p ~/Developer/GitHub/craigsloggett
  - Git clone the dotfiles repository
-   - $ cd ~/Source/GitHub/nerditup && git clone git@github.com:nerditup/dotfiles.git
+   - $ cd ~/Developer/GitHub/craigsloggett && git clone git@github.com:craigsloggett/dotfiles.git
 
-Configure ZSH
--------------
- - Create the XDG Directories
-   - $ mkdir -p ~/.config
-   - $ mkdir -p ~/.cache
-   - $ mkdir -p ~/.local/share
-   - $ mkdir -p ~/.local/bin
-   - $ mkdir -p ~/.local/lib
- - $ chmod 755 /usr/local/share/zsh
- - $ chmod 755 /usr/local/share/zsh/site-functions
- - $ mkdir -p ~/.local/share/zsh
- - Download the system zshenv file
-   - $ cd ~/Downloads && curl -L -O https://raw.githubusercontent.com/nerditup/scripts/master/macOS/etc/zshenv
-   - $ sudo cp zshenv /etc/zshenv
- - Symlink ZSH configuration
-   - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/zsh/.config/zsh ~/.config/zsh
- - Close the Terminal and re-open.
- - Clean up left-over ZSH files.
-   - $ rm ~/.zsh_history
-   - $ rm -rf ~/.zsh_sessions
+Configure ZSH, vim, git, gpg, pass, less and tmux
+-------------------------------------------------
+ - Install remaining utilities using brew
+   - $ brew install vim git tmux
+ - Run the install script found in the dotfiles repository
+   - $ cd ~/Developer/GitHub/craigsloggett/dotfiles && ./install
 
 Cleanup
 -------
@@ -251,28 +222,6 @@ Cleanup
    - Copy Terminal settings from Server
      - $ cd ~/Downloads && scp user@my-server-ip:/backup/directory/Google.terminal .
    - Import profile into Terminal
- - vim
-   - Create the cache and data directories
-     - $ mkdir -p ~/.cache/vim
-     - $ mkdir -p ~/.local/share/vim
-   - Symlink vim configuration
-     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/vim/.config/vim ~/.config/vim
-   - Clean up left-over Vim files.
-     - $ rm ~/.viminfo
- - git
-   - Symlink git configuration
-     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/git/.config/git ~/.config/git
-   - Create ~/.config/git/config-personal with email and signing key configured.
-     - $ gpg --list-keys --with-subkey-fingerprint | grep '\[S\]' -A 1
- - gnupg
-   - Symlink GnuPG configuration
-     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/gnupg/.local/share/gnupg/gpg.conf ~/.local/share/gnupg/gpg.conf
- - less
-   - Create the less history directory
-     - $ mkdir -p ~/.local/share/less
-   - Cleanup
-     - $ rm ~/.lesshst  # (may not exist if less never used)
-
 
 Install Additional Applications
 -------------------------------
@@ -284,22 +233,3 @@ Install Additional Applications
      - Check "Hide menu bar icon"
      - Check "Check for updates automatically"
      - Set "Gaps between windows" to 10 px
- - Install UTM with Homebrew
-   - $ brew install --cask utm
-
-Setup Development Environment
------------------------------
-...
- - Install tmux with Homebrew
-   - $ brew install tmux
-   - Symlink tmux configuration
-     - $ ln -s ~/Source/GitHub/nerditup/dotfiles/macOS/tmux/.config/tmux ~/.config/tmux
- - Install shellcheck with Homebrew
-   - $ brew install shellcheck
-
-Install Work Apps
------------------
- - $ brew install --cask slack
- - $ brew install --cask microsoft-teams
- - $ brew install --cask zoom
- - $ brew install --cask signal
