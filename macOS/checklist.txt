@@ -230,7 +230,7 @@ Clone Dotfiles
  - Prepare the dotfiles source directory
    - $ mkdir -p ~/Developer/GitHub/craigsloggett
  - Git clone the dotfiles repository
-   - $ cd ~/Developer/GitHub/craigsloggett && git clone git@github.com:craigsloggett/dotfiles.git
+   - $ cd ~/Developer/GitHub/craigsloggett && git clone --recurse-submodules git@github.com:craigsloggett/dotfiles.git
 
 Configure ZSH, vim, git, gpg, pass, less and tmux
 -------------------------------------------------
