@@ -256,3 +256,6 @@ Install Additional Applications
      - Check "Hide menu bar icon"
      - Check "Check for updates automatically"
      - Set "Gaps between windows" to 10 px
+
+ - Install IINA with Homebrew
+   - $ brew install --cask iina
