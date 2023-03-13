@@ -5,17 +5,17 @@ Setup macOS
 
 ### Username
 
- - System Settings...
- - Users & Groups
- - Add Account
- - Create a new temporary account "Administrator" account.
- - Login as the temporary user.
- - System Settings...
- - Users & Groups
- - Right click the user to change, select "Advanced Options..."
- - Update the "User name" to have a capital letter.
- - Update the "Home directory" to have a capital letter.
- - Rename the "Home directory" to match the capital letter.
+ 1. Select ` -> System Settings...`
+ 2. Select `Users & Groups`
+ 3. Select `Add Account`
+ 4. Create a new temporary "Administrator" account.
+ 5. Login as the temporary user.
+ 6. Select ` -> System Settings...`
+ 7. Select `Users & Groups`
+ 8. Right click the user, select `Advanced Options...`
+ 9. Update the `User name` field to have a capital letter.
+ 10. Update the `Home directory` field to have a capital letter.
+ 11. In finder, rename the Home directory to match.
 
 ### Homebrew
 
