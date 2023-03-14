@@ -19,6 +19,14 @@ Setup macOS
 
 ### Homebrew
 
+Install the Homebrew package manager with the following command:
+
 ```shell
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+
+### Configure SSH
+ 1. Create an SSH Key
+   - $ ssh-keygen -t ed25519
+ 2. Copy SSH Key to Server
+   - $ ssh-copy-id user@my-server-ip
