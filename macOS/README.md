@@ -141,3 +141,73 @@ Copy the `user.js` file from the configuration server:
 ```shell
 scp user@my-server:/backup/directory/user.js ~/Library/Application\ Support/Firefox/Profiles/*.default-release
 ```
+
+## System Preferences
+
+### Apple ID
+
+Login and uncheck all iCloud options except for:
+ - Reminders
+ - Notes
+
+### Wi-Fi
+
+No change
+
+### Bluetooth
+
+No change
+
+### Network
+
+Turn on Firewall
+
+### Notifications
+
+No change
+
+### Sound
+
+No change
+
+### Focus
+
+No change
+
+### Screen Time
+
+No change
+
+### General
+
+#### Software Update
+
+Enable Automatic Updates
+
+### Appearance
+
+No change
+
+### Accessibility
+
+No change
+
+### Control Center
+
+Set Bluetooth to Show in Menu Bar
+Set Sound to Always Show in Menu Bar
+Set Fast User Switching to Don't Show in Menu Bar
+Set Spotlight to Don't Show in Menu Bar
+
+### Privacy & Security
+
+Turn on FileVault
+
+### Desktop & Dock
+
+Adjust size of Dock to be smaller
+
+### Displays
+
+Adjust size of text
+
