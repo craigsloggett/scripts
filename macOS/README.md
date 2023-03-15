@@ -57,7 +57,7 @@ ssh-copy-id user@my-server
 
 ## Install GnuPG and Import Keys
 
-**Requires:** 
+**Requires:**
  - `ssh`
 
 Install `gnupg` with Homebrew:
@@ -82,8 +82,8 @@ GNUPGHOME=~/.local/share/gnupg gpg --import ~/Desktop/secret-subkeys.gpg
 
 ## Install Pass and Git Clone the Password Store
 
-**Requires:** 
- - `ssh` 
+**Requires:**
+ - `ssh`
  - `gnupg`
 
 Install `pass` with Homebrew:
@@ -210,4 +210,3 @@ Adjust size of Dock to be smaller
 ### Displays
 
 Adjust size of text
-

@@ -238,6 +238,8 @@ Configure ZSH, vim, git, gpg, pass, less and tmux
    - $ brew install vim git tmux
  - Run the install script found in the dotfiles repository
    - $ cd ~/Developer/GitHub/craigsloggett/dotfiles && ./install
+ - (Optional) Install utilities for vim using brew
+   - $ brew install fzf shellcheck shfmt terraform tflint yamllint
 
 Cleanup
 -------
