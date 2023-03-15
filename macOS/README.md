@@ -1,5 +1,4 @@
-Setup macOS
-===========
+# Setup macOS
 
 ## Prepare the OS
 
@@ -25,8 +24,120 @@ Install the Homebrew package manager with the following command:
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-### Configure SSH
- 1. Create an SSH Key
-   - $ ssh-keygen -t ed25519
- 2. Copy SSH Key to Server
-   - $ ssh-copy-id user@my-server-ip
+### Developer Directory
+
+Create a _Developer_ directory in the `$HOME` folder:
+
+```shell
+mkdir -p ~/Developer
+```
+
+### Hosts File
+
+Add the configuration and secrets server to `/etc/hosts`:
+
+```shell
+sudo vi /etc/hosts
+# Add the IP address and hostname to the end of this file.
+```
+
+## Configure SSH
+
+First, create an SSH key:
+
+```shell
+ssh-keygen -t ed25519
+```
+
+Then copy the SSH key to the server containing the rest of the configuration:
+
+```shell
+ssh-copy-id user@my-server
+```
+
+## Install GnuPG and Import Keys
+
+**Requires:** 
+ - `ssh`
+
+Install `gnupg` with Homebrew:
+
+```shell
+brew install gnupg
+```
+
+Copy GPG keys from the server containing the required secret (sub)keys:
+
+```shell
+scp user@my-server:/key/directory/secret-subkeys.gpg ~/Desktop
+```
+
+Create the configuration directory, then import the GPG keys:
+
+```shell
+mkdir -p ~/.local/share/gnupg
+chmod 700 ~/.local/share/gnupg
+GNUPGHOME=~/.local/share/gnupg gpg --import ~/Desktop/secret-subkeys.gpg
+```
+
+## Install Pass and Git Clone the Password Store
+
+**Requires:** 
+ - `ssh` 
+ - `gnupg`
+
+Install `pass` with Homebrew:
+
+```shell
+brew install pass
+```
+
+Clone the password store from the server containing the repository:
+
+```shell
+mkdir -p ~/.local/share/pass
+chmod 700 ~/.local/share/pass
+git clone user@my-server:/pass/directory/password-store.git ~/.local/share/pass
+```
+
+Test `pass` works:
+
+```shell
+GNUPGHOME=~/.local/share/gnupg PASSWORD_STORE_DIR=~/.local/share/pass pass
+```
+
+## Install and Configure Firefox
+
+Install **Firefox** with Homebrew:
+
+```shell
+brew install --cask firefox
+```
+
+In order to install the Firefox configuration, you need to grant Full Disk Access to Terminal:
+
+`System Settings -> Privacy & Security -> Full Disk Access`
+
+Following this, create a `distribution` folder:
+
+```shell
+mkdir /Applications/Firefox.app/Contents/Resources/distribution
+```
+
+Copy the `policies.json` file from the configuration server:
+
+```shell
+scp user@my-server:/backup/directory/policies.json /Applications/Firefox.app/Contents/Resources/distribution
+```
+
+Remove Full Disk Access for the Terminal:
+
+`System Settings -> Privacy & Security -> Full Disk Access`
+
+Firefox will create a profile directory for the user the first time is it opened. This will be overwritten with a `user.js` file with custom configuration. Open Firefox and then close it right away.
+
+Copy the `user.js` file from the configuration server:
+
+```shell
+scp user@my-server:/backup/directory/user.js ~/Library/Application\ Support/Firefox/Profiles/*.default-release
+```
