@@ -28,7 +28,7 @@
 Run the setup script from this repository using the following command:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/craigsloggett/scripts/HEAD/macOS/install.sh | sh
+curl -fsSL "https://raw.githubusercontent.com/craigsloggett/scripts/refs/heads/macOS/macOS/install.sh" | sh
 ```
 
 ### Homebrew
