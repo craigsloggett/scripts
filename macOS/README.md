@@ -1,20 +1,35 @@
-# Setup macOS
+# Setup macOS Sequoia
 
 ## Prepare the OS
 
 ### Username
 
- 1. Select `System Settings...`
- 2. Select `Users & Groups`
- 3. Select `Add Account`
- 4. Create a new temporary "Administrator" account.
- 5. Login as the temporary user.
- 6. Select `System Settings...`
- 7. Select `Users & Groups`
- 8. Right click the user, select `Advanced Options...`
- 9. Update the `User name` field to have a capital letter.
- 10. Update the `Home directory` field to have a capital letter.
- 11. In finder, rename the Home directory to match.
+1. Select `System Settings...`
+2. Select `Users & Groups`
+3. Select `Add User`
+4. Create a new temporary "Administrator" account.
+5. Login as the temporary user.
+6. Select `System Settings...`
+7. Select `Users & Groups`
+8. Right click the user, select `Advanced Options...`
+9. Update the `User name` field to have a capital letter.
+10. Update the `Home directory` field to have a capital letter.
+11. In finder, rename the Home directory to match.
+12. Login as the main user.
+13. Select `System Settings...`
+14. Select `Users & Groups`
+15. Select `ⓘ` for the temporary "Administrator" account.
+16. Select `Delete User...`
+17. Select `Delete the home folder` then `Delete User`
+18. Reboot
+
+### Setup
+
+Run the setup script from this repository using the following command:
+
+```shell
+curl -fsSL https://raw.githubusercontent.com/craigsloggett/scripts/HEAD/macOS/install.sh | sh
+```
 
 ### Homebrew
 
