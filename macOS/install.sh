@@ -7,9 +7,13 @@ osascript -e 'tell application "System Preferences" to quit'
 # Ask for the administrator password upfront
 sudo -v
 
-# Prompt the user for the desired hostname
-echo "Please enter the desired hostname: "
-read -r hostname
+# Prompt the user for the desired hostname (use a default if non-interactive)
+if [ -t 0 ]; then
+  echo "Please enter the desired hostname: "
+  read -r hostname
+else
+  hostname="macOS"
+fi
 
 # Validate the input (ensure it's not empty)
 if [ -z "${hostname}" ]; then
@@ -65,4 +69,4 @@ defaults -currentHost write com.apple.Spotlight MenuItemHidden -bool true
 defaults write -g InitialKeyRepeat -int 25
 defaults write -g KeyRepeat -int 2
 
-reboot
+sudo reboot
