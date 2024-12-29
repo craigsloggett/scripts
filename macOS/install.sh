@@ -69,4 +69,21 @@ defaults -currentHost write com.apple.Spotlight MenuItemHidden -bool true
 defaults write -g InitialKeyRepeat -int 25
 defaults write -g KeyRepeat -int 2
 
+# Clear the Dock
+defaults write com.apple.dock persistent-apps -array
+
+# Add applications to the Dock
+
+# Set the icon size of Dock items to 46 pixels
+defaults write com.apple.dock tilesize -int 46
+
+# Automatically hide and show the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Restart the Dock to apply changes
+killall Dock
+
+# Prevent Time Machine from prompting to use new hard drives as backup volume
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
 sudo reboot
