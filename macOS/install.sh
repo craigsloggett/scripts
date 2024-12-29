@@ -86,4 +86,11 @@ killall Dock
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
+# Check if FileVault is already enabled
+fv_status=$(fdesetup status)
+if echo "$fv_status" | grep -q "FileVault is Off"; then
+  # Enable FileVault
+  sudo fdesetup enable -user "$(whoami)" | tee ~/Desktop/"FileVault Recovery Key.txt"
+fi
+
 sudo reboot
