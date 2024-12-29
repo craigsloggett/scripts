@@ -1,8 +1,10 @@
 #!/bin/sh
 
-SSH_KEYFILE="${HOME}/.ssh/id_ed25519"
-
+# Create a Developer directory
 mkdir -p ~/Developer
+
+# Create an SSH key pair
+SSH_KEYFILE="${HOME}/.ssh/id_ed25519"
 
 if [ ! -f "${SSH_KEYFILE}" ]; then
   ssh-keygen -q -t ed25519 -f "${SSH_KEYFILE}" -N ''
@@ -20,3 +22,12 @@ fi
 /usr/libexec/ApplicationFirewall/socketfilterfw --remove /usr/libexec/sharingd
 /usr/libexec/ApplicationFirewall/socketfilterfw --remove /usr/libexec/sshd-keygen-wrapper
 /usr/libexec/ApplicationFirewall/socketfilterfw --remove /usr/sbin/smbd
+
+# Enable software update settings
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
+sudo softwareupdate --schedule on
