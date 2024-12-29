@@ -31,3 +31,9 @@ sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdate
 sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
 sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
 sudo softwareupdate --schedule on >/dev/null 2>&1
+
+# Disable Fast User Switching in the menu bar
+sudo defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false
+
+# Reload the SystemUIServer to apply the settings immediately
+killall SystemUIServer
