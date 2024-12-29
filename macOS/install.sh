@@ -56,8 +56,13 @@ sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bo
 sudo softwareupdate --schedule on >/dev/null 2>&1
 
 # Disable Fast User Switching in the menu bar
-sudo defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false
+defaults write -g MultipleSessionEnabled -bool false
+
+# Don't show the Spotlight icon in the menu bar
+defaults -currentHost write com.apple.Spotlight MenuItemHidden -bool true
 
 # Configure the keyboard settings
-defaults write -g InitialKeyRepeat -int 15
+defaults write -g InitialKeyRepeat -int 25
 defaults write -g KeyRepeat -int 2
+
+reboot
