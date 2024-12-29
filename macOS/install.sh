@@ -1,5 +1,28 @@
 #!/bin/sh
 
+# Close any open System Preferences panes, to prevent them from overriding
+# settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Prompt the user for the desired hostname
+echo "Please enter the desired hostname: "
+read -r hostname
+
+# Validate the input (ensure it's not empty)
+if [ -z "${hostname}" ]; then
+  echo "Hostname cannot be empty. Please run the script again."
+  exit 1
+fi
+
+# Set computer name (as done via System Preferences → Sharing)
+sudo scutil --set ComputerName "${hostname}"
+sudo scutil --set HostName "${hostname}"
+sudo scutil --set LocalHostName "${hostname}"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${hostname}"
+
 # Create a Developer directory
 mkdir -p ~/Developer
 
@@ -35,5 +58,6 @@ sudo softwareupdate --schedule on >/dev/null 2>&1
 # Disable Fast User Switching in the menu bar
 sudo defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false
 
-# Reload the SystemUIServer to apply the settings immediately
-killall SystemUIServer
+# Configure the keyboard settings
+defaults write -g InitialKeyRepeat -int 15
+defaults write -g KeyRepeat -int 2
