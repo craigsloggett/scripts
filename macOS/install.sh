@@ -30,4 +30,4 @@ sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool tru
 sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
 sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
 sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
-sudo softwareupdate --schedule on
+sudo softwareupdate --schedule on >/dev/null 2>&1
