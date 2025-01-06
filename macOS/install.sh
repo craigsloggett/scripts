@@ -1,31 +1,19 @@
 #!/bin/sh
 
-# Close any open System Preferences panes, to prevent them from overriding
-# settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+# Globally disable globbing and enable exit-on-error.
+set -ef
+
+# Defaults for environment variables.
+: "${COMPUTER_NAME:?Please set the COMPUTER_NAME environment variable and run the script again.}"
 
 # Ask for the administrator password upfront
 sudo -v
 
-# Prompt the user for the desired hostname (use a default if non-interactive)
-if [ -t 0 ]; then
-  echo "Please enter the desired hostname: "
-  read -r hostname
-else
-  hostname="macOS"
-fi
-
-# Validate the input (ensure it's not empty)
-if [ -z "${hostname}" ]; then
-  echo "Hostname cannot be empty. Please run the script again."
-  exit 1
-fi
-
 # Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set ComputerName "${hostname}"
-sudo scutil --set HostName "${hostname}"
-sudo scutil --set LocalHostName "${hostname}"
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${hostname}"
+sudo scutil --set ComputerName "${COMPUTER_NAME}"
+sudo scutil --set HostName "${COMPUTER_NAME}"
+sudo scutil --set LocalHostName "${COMPUTER_NAME}"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${COMPUTER_NAME}"
 
 # Create a Developer directory
 mkdir -p ~/Developer
