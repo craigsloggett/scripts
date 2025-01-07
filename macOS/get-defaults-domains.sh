@@ -1,8 +1,9 @@
 #!/bin/sh
 
+output_filename="defaults-by-domain.txt"
 domains="$(defaults domains | tr ',' '\n' | tr -d ' ' | sort -u)"
 
-: >defaults-by-domain.txt
+: >"${output_filename}"
 
 defaults domains | tr ',' '\n' | tr -d ' ' | sort -u |
   while read -r domain; do
@@ -12,7 +13,7 @@ defaults domains | tr ',' '\n' | tr -d ' ' | sort -u |
       printf '%s\n' "The defaults command failed to read the domain."
     else
       printf '%s\n' "Success! Adding the domain to a list for future use."
-      printf '%s\n' "${domain}" >>defaults-by-domain.txt
+      printf '%s\n' "${domain}" >>"${output_filename}"
     fi
   done
 
@@ -27,11 +28,11 @@ find ~/Library/Preferences -type f -name "*.plist" |
         printf '%s\n' "The defaults command failed to read the domain."
       else
         printf '%s\n' "Success! Adding the domain to a list for future use."
-        printf '%s\n' "${domain}" >>defaults-by-domain.txt
+        printf '%s\n' "${domain}" >>"${output_filename}"
       fi
     else
       printf '%s\n' "N"
     fi
   done
 
-sort -u defaults-by-domain.txt -o defaults-by-domain.txt
+sort -u "${output_filename}" -o "${output_filename}"
