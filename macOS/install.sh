@@ -6,14 +6,98 @@ set -ef
 # Defaults for environment variables.
 : "${COMPUTER_NAME:?Please set the COMPUTER_NAME environment variable and run the script again.}"
 
-# Ask for the administrator password upfront
+# Ask for the administrator password upfront.
 sudo -v
 
-# Set computer name (as done via System Preferences → Sharing)
+# Run through Sequoia's System Settings from the top.
+
+## Wi-Fi
+
+## Bluetooth
+
+## Network
+
+## Energy
+
+## General
+
+### About
+
 sudo scutil --set ComputerName "${COMPUTER_NAME}"
+
+### Software Update
+
+### Storage
+
+### AppleCare & Warranty
+
+### AirDrop & Handoff
+
+### AutoFill & Passwords
+
+### Date & Time
+
+### Language & Region
+
+### Login Items & Extensions
+
+### Sharing
+
 sudo scutil --set HostName "${COMPUTER_NAME}"
 sudo scutil --set LocalHostName "${COMPUTER_NAME}"
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${COMPUTER_NAME}"
+
+### Startup Disk
+
+### Time Machine
+
+### Device Management
+
+### Transfer or Reset
+
+## Accessibility
+
+## Siri
+
+## Control Center
+
+## Desktop & Dock
+
+## Displays
+
+## Screen Saver
+
+## Spotlight
+
+## Wallpaper
+
+## Notifications
+
+## Sound
+
+## Focus
+
+## Screen Time
+
+## Lock Screen
+
+## Privacy & Security
+
+## Login Password
+
+## Users & Groups
+
+## Internet Accounts
+
+## Game Center
+
+## iCloud
+
+## Wallet & Apple Pay
+
+## Keyboard
+
+## Printers & Scanners
 
 # Create a Developer directory
 mkdir -p ~/Developer
@@ -80,5 +164,3 @@ if echo "$fv_status" | grep -q "FileVault is Off"; then
   # Enable FileVault
   sudo fdesetup enable -user "$(whoami)" | tee ~/Desktop/"FileVault Recovery Key.txt"
 fi
-
-sudo reboot
