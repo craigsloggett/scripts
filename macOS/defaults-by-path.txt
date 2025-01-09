@@ -1,0 +1,4 @@
+/Users/Craig/Library/Preferences/.GlobalPreferences.plist
+/Users/Craig/Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist
+/Users/Craig/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist
+/Users/Craig/Library/Preferences/no_backup/commcenter_runtime_storage.plist
