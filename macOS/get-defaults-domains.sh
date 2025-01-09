@@ -47,37 +47,51 @@ printf '%s\n' "${domains}" |
 # (not the full path) that are not listed using the `defaults domains` command.
 for directory in "${HOME}/Library/Preferences" "${HOME}/Library/Containers"; do
 
-  # Some of the directories have restricted access so we run `find` against the
-  # directory and if it fails, we skip it.
-  if find "${directory}" >/dev/null 2>&1; then
+  # Some directories might not exist on a clean install.
+  if [ -d "${directory}" ]; then
+    # Some of the directories have restricted access so we run `find` against the
+    # directory and if it fails, we skip it.
+    if find "${directory}" >/dev/null 2>&1; then
 
-    find "${directory}" -type f -name "*.plist" |
-      while read -r plist; do
+      find "${directory}" -type f -name "*.plist" |
+        while read -r plist; do
 
-        # Get the domain from the full path in the same format as those available
-        # by the `defaults` command.
-        domain="$(basename "${plist}" '.plist')"
+          # Get the domain from the full path in the same format as those available
+          # by the `defaults` command.
+          domain="$(basename "${plist}" '.plist')"
 
-        # We have already gone over the domains listed by the `defaults domains`
-        # command so we take only domains that are not listed.
-        if ! printf '%s\n' "${domains}" | grep -qx "${domain}"; then
+          # We have already gone over the domains listed by the `defaults domains`
+          # command so we take only domains that are not listed.
+          if ! printf '%s\n' "${domains}" | grep -qx "${domain}"; then
 
-          # Even though this domain has an associated plist file, it may be
-          # restricted, ephemeral, or otherwise unreadable. We run `defaults read`
-          # to confirm it actually contains readable preferences. If this fails,
-          # we skip it.
-          if defaults read "${domain}" >/dev/null 2>&1; then
-            printf '%s\n' "${domain}" >>"${defaults_by_domain_filename}"
+            # Even though this domain has an associated plist file, it may be
+            # restricted, ephemeral, or otherwise unreadable. We run `defaults read`
+            # to confirm it actually contains readable preferences. If this fails,
+            # we skip it.
+            if defaults read "${domain}" >/dev/null 2>&1; then
+              printf '%s\n' "${domain}" >>"${defaults_by_domain_filename}"
+            else
+
+              # And the same but for the domains that must be specified using the
+              # full path to the plist file.
+              if defaults read "${plist}" >/dev/null 2>&1; then
+                printf '%s\n' "${plist}" >>"${defaults_by_path_filename}"
+              fi
+            fi
+          else
+
+            # Capture the domains that are in the `defaults domains` list but
+            # fail to be read by the `defaults read` command using the domain.
+            if ! defaults read "${domain}" >/dev/null 2>&1; then
+
+              # Attempt to read the domain using the full path to the plist file.
+              if defaults read "${plist}" >/dev/null 2>&1; then
+                printf '%s\n' "${plist}" >>"${defaults_by_path_filename}"
+              fi
+            fi
           fi
-
-          # And the same but for the domains that must be specified using the
-          # full path to the plist file.
-          if defaults read "${plist}" >/dev/null 2>&1; then
-            printf '%s\n' "${plist}" >>"${defaults_by_path_filename}"
-          fi
-        fi
-
-      done
+        done
+    fi
   fi
 done
 
