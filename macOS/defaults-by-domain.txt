@@ -1,6 +1,8 @@
+.GlobalPreferences
 .GlobalPreferences_m
 APMAnalyticsSuiteName
 APMExperimentSuiteName
+Avatar Cache Index
 B7F62B65BN.group.okta.verify.shared
 ContextStoreAgent
 SKGActivityJournal
