@@ -40,6 +40,13 @@ printf '%s\n' "${domains}" |
     # we skip it.
     if defaults read "${domain}" >/dev/null 2>&1; then
       printf '%s\n' "${domain}" >>"${defaults_by_domain_filename}"
+
+      # TODO: Begin implementing key iteration.
+      keys="$(defaults read "${domain}" | awk -F= '/=/ {print $1}' | tr -d '"' | sed 's/^ *//')"
+      printf '%s\n' "${keys}" |
+        while read -r key; do
+          printf '%s\n' "defaults write ${domain} ${key} -bool true # TODO: Update type flag and value with defaults." >>defaults.txt
+        done
     fi
   done
 
